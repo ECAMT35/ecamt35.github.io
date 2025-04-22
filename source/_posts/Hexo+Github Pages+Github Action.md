@@ -3,7 +3,7 @@ title: Hexo+Github Pages+Github Action
 date: 2025-04-07 00:00:00
 description: 博客部署相关
 categories: 
-- 折腾
+- 其他
 tags:
 - Hexo
 - Github
