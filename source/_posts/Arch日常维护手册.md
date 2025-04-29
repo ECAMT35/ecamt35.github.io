@@ -351,45 +351,44 @@ https://wiki.archlinuxcn.org/wiki/NetworkManager
 List nearby Wi-Fi networks:
 
 ```bash
-$ nmcli device wifi list
+nmcli device wifi list
 ```
 
 Connect to a Wi-Fi network:
 
 ```bash
-$ nmcli device wifi connect _SSID_or_BSSID_ password _password_
+nmcli device wifi connect _SSID_or_BSSID_ password _password_
 ```
 
 Connect to a hidden Wi-Fi network:
 
 ```bash
-$ nmcli device wifi connect _SSID_or_BSSID_ password _password_ hidden yes
+nmcli device wifi connect _SSID_or_BSSID_ password _password_ hidden yes
 ```
 
 Get a list of connections with their names, UUIDs, types and backing devices:
 
 ```bash
-$ nmcli connection show
+nmcli connection show
 ```
 
 Delete a connection:
 
 ```bash
-$ nmcli connection delete _name_or_uuid_
+nmcli connection delete _name_or_uuid_
 ```
 
 See a list of network devices and their state:
 
 ```bash
-$ nmcli device
+nmcli device
 ```
 
 Turn off Wi-Fi:
 
 ```bash
-$ nmcli radio wifi off
+nmcli radio wifi off
 ```
-
 
 # 临时粘贴版 fars.ee
 
@@ -426,5 +425,62 @@ glxinfo | grep "OpenGL renderer"
 ## 监控 Nvidia GPU
 ```bash
 nvidia-smi
+```
+
+# Archiving and compression
+
+## 推荐算法
+
+- LZMA2(xz)：高压缩率的代表，但是压缩/解压占用更多的cpu等资源
+- Zstd：是LZMA2和LZ4的平衡，压缩率与速度的性价比很高
+- LZ4：极速压缩/解压的代表，占用资源低，但是压缩率比较低
+
+根据数据的冷热自行选择
+
+## bsdtar
+
+>提示：GNU 和 BSD tar 都自动为 bzip2、compress、gzip、lzip、lzma、lzop、zstd 和 xz 压缩归档执行解压缩。lz4 只有 BSD tar 支持（但是 GNU tar 可以使用--use-compress-program=lz4/-Ilz4进行等效操作）。当创建归档文件时，两者都支持-a开关，以根据文件扩展名通过正确的压缩程序自动处理创建的归档。BSD tar 根据格式识别压缩格式，而 GNU tar 只根据文件扩展名猜测压缩格式。
+
+[bsdtar-man手册](https://man.archlinux.org/man/bsdtar.1)
+
+常规用法：
+```bash
+First option must be a mode specifier:
+  -c Create  -r Add/Replace  -t List  -u Update  -x Extract
+Common Options:
+  -b #  Use # 512-byte records per I/O block
+  -f <filename>  Location of archive (default /dev/st0)
+  -v    Verbose
+  -w    Interactive
+Create: bsdtar -c [options] [<file> | <dir> | @<archive> | -C <dir> ]
+  <file>, <dir>  add these items to archive
+  -z, -j, -J, --lzma  Compress archive with gzip/bzip2/xz/lzma
+  --format {ustar|pax|cpio|shar}  Select archive format
+  --exclude <pattern>  Skip files that match pattern
+  -C <dir>  Change to <dir> before processing remaining files
+  @<archive>  Add entries from <archive> to output
+List: bsdtar -t [options] [<patterns>]
+  <patterns>  If specified, list only entries that match
+Extract: bsdtar -x [options] [<patterns>]
+  <patterns>  If specified, extract only entries that match
+  -k    Keep (don't overwrite) existing files
+  -m    Don't restore modification times
+  -O    Write entries to stdout, don't restore to disk
+  -p    Restore permissions (including ACLs, owner, file flags)
+```
+
+示例：
+```bash
+bsdtar -cJf <archive_name.tar.xz> [--options xz:compression-level=9] </path/to/directory>
+```
+
+针对 .tar.xz 文件完整性检查
+- bsdtar 的 -t 选项可以列出压缩包内的文件列表，确保元数据正常。如果压缩包损坏，此操作会直接报错。
+- 通过对比归档的哈希值，确保整个归档未被篡改
+e.g.
+```bash
+bsdtar -tvf <filename>
+
+sha256sum <filename>
 ```
 
