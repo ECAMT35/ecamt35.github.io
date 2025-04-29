@@ -12,6 +12,19 @@ Archlinux + Labwc WM (Wayland)
 
 My dotfiles : https://github.com/ECAMT35/dotfiles.git
 
+# Arch
+
+主文件系统：ext4
+分区：/boot=1G, /=128G, SWAP=32G, /home=remaining, total=1T
+boot：GRUB
+
+命令解释器: bash
+文本编辑器: neovim
+网络: NetworkManager
+硬盘检测: smartmontools
+监控: htop
+笔记本电源管理: TLP
+
 # labwc
 
 官方文档：[labwc](https://labwc.github.io/integration.html)
@@ -21,7 +34,7 @@ My dotfiles : https://github.com/ECAMT35/dotfiles.git
 字体:
 noto-fonts 
 noto-fonts-cjk
-ttf-nerd-fonts-symbols 
+ttf-nerd-fonts-symbols
 ttf-nerd-fonts-symbols-common
 
 屏幕管理:
@@ -30,13 +43,9 @@ ttf-nerd-fonts-symbols-common
 屏幕分辨率: [wlr-randr](https://sr.ht/~emersion/wlr-randr/)
 背光调节: brightnessctl
 桌面壁纸: [swaybg](https://github.com/swaywm/swaybg)
-
-命令解释器: bash
-终端模拟器: foot
-文本编辑器: neovim
-
 bar: waybar
-网络: NetworkManager
+
+终端模拟器: foot
 输入法: fcitx5
 启动器: [wofi](https://man.archlinux.org/man/wofi.1.en)
 剪切板: wofi + wl-clipboard + [cliphist](https://github.com/sentriz/cliphist)
@@ -58,11 +67,7 @@ XDG 桌面门户: xdg-desktop-portal-gtk, xdg-desktop-portal-wlr
 
 文档编辑: LibreOffice, obsiadian
 画板、图片编辑: krita
-
 小沙箱: flatpak
-硬盘检测: smartmontools
-监控: htop
-笔记本电源管理: TLP
 
 ---
 
