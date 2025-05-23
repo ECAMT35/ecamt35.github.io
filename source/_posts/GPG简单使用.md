@@ -23,7 +23,7 @@ https://wiki.archlinux.org/title/GnuPG
 gpg -r ECAMT -e 1.png 
 ```
 
-使用对称加解密（）：
+使用对称加解密：
 
 ```bash
 gpg -c 1.png 
