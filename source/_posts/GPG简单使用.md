@@ -1,7 +1,7 @@
 ---
 title: GPG简单使用
 date: 2025-05-18 00:00:00
-description: GPG简单使用 
+description: 这是仅你所知的秘密; 这是证明我的唯一方式
 categories: 
 - GNU/Linux
 tags:
