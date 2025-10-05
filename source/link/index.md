@@ -13,3 +13,5 @@ type: "link"
 - [que-junle](https://que-junle.github.io/)
 
 - [harrisonsontan](https://harrisonsontan.github.io/)
+
+- [akibarika](https://www.akibarika.wiki/)
