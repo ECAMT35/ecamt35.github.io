@@ -7,45 +7,73 @@ categories:
 tags:
 - Netty
 - WebSocket
+- NIO
 ---
+**Netty的主从Reactor多线程模型**：BossGroup 处理连接请求，WorkerGroup 处理I/O操作。
 
-**Netty的主从Reactor多线程模型**：BossGroup处理连接请求，WorkerGroup处理I/O操作
-
-Netty工作一般需要三个线程组：
+Netty 一般需要两个必须的线程组 + 一个可选的自定义业务线程池来完成工作：
 
 - **BossGroup**：与客户端建立连接；
 - **WorkerGroup**：处理已连接的 I/O 事件（读写、编解码）；
 - **自定义业务线程池**：执行耗时的业务逻辑（如数据库操作、复杂计算）；
 
-具体工作流程：
+大致的工作流程：
 
 1. **监听端口**：BossGroup 中的线程会绑定服务端端口（如 8080），持续监听客户端的 TCP 连接请求（三次握手）；
-2. **接收连接**：当客户端完成 TCP 三次握手后，连接会进入内核的 “已完成连接队列”，BossGroup 的线程调用`accept()`获取该连接，生成代表连接的`Channel`对象；
-3. **转交连接**：将`Channel`注册到 WorkerGroup 中某个线程（`EventLoop`）的`Selector`上，此后该连接的所有 I/O 事件都由这个 Worker 线程负责。
+2. **接收连接**：当客户端完成 TCP 三次握手后，连接会进入内核的 “已完成连接队列”，BossGroup 的线程调用 `accept()` 获取该连接，生成代表连接的 `Channel` 对象；
+3. **转交连接**：将 `Channel` 注册到 WorkerGroup 中某个 Worker 线程（`EventLoop`）的 `Selector` 上，此后该连接的所有 I/O 事件都由这个 Worker 线程负责。
+4. **转交业务**：如有耗时业务，Worker 线程则把该业务给业务线程池，Worker 线程继续处理 I/O 事件。
 
-## BossGroup
+# BossGroup
 
-`BossGroup` 的工作非常轻量（仅处理连接建立），因此线程数不需要太多。实际开发中通常直接使用`new NioEventLoopGroup(1)`——1 个线程足够应对大部分场景。
+BossGroup 的工作非常轻量（仅处理连接建立），因此线程数不需要太多。实际开发中通常直接使用 `new NioEventLoopGroup(1)` ——1 个线程足够应对大部分场景。
 
-## WorkerGroup
+# WorkerGroup
 
-`WorkerGroup`是 Netty 处理 I/O 事件的核心，它的职责是**处理已建立连接的所有网络事件**，包括：
+WorkerGroup 是 Netty 处理 I/O 事件的核心，它的职责是**处理已建立连接的所有网络事件**，包括：
 
 - 读取客户端发送的数据；
 - 对数据进行编解码（如 JSON 转对象、协议解析）；
 - 将处理后的数据写回客户端。
 
-Q：为什么说 WorkerGroup 是 "传送带"？
-A：WorkerGroup 中的每个线程（`EventLoop`）都绑定一个`Selector`（多路复用器），负责监听其管理的所有`Channel`的 I/O 事件。由于 I/O 操作是非阻塞的（基于 NIO 的`select`机制），Worker 线程在等待 I/O 就绪时不会阻塞，可高效切换到其他就绪的`Channel`处理事件 —— 这就像传送带，始终在 "搬运" 数据，不浪费时间等待。
-
-Q：为什么说 WorkerGroup 需要拒绝耗时操作
-WorkerGroup 的线程是 "I/O 专用" 的，**绝对不能在其中执行耗时业务逻辑**（如查询数据库、调用远程接口）。原因很简单：如果 Worker 线程被耗时任务占用，会导致其管理的所有`Channel`的 I/O 事件无法及时处理，最终引发连接超时、吞吐量下降。
-
 WorkerGroup 的线程数通常设置为**CPU 核心数 × 2**（Netty 的默认值）。
 
-## 业务线程池
+整个 WorkerGroup 的结构大概如下：
 
-当 WorkerGroup 完成数据的读取和编解码后，就需要处理具体的业务逻辑了（如校验数据、操作数据库、调用 RPC 服务）。这些操作往往耗时较长（毫秒级甚至秒级），如果放在 Worker 线程中执行，会阻塞 I/O 处理 —— 因此需要一个专门的**业务线程池**来承载这些 "重活"。
+```markdown
+WorkerGroup（工作线程组：管理所有 Worker，负责连接分配）
+├─ Worker 1（EventLoop 线程：处理I/O事件，驱动 Selector）
+│  └─ Selector 1（多路复用器：监听I/O事件，仅负责"检测"不处理）
+│     ├─ Channel 1（连接通道：对应客户端A的TCP连接，传输数据）
+│     ├─ Channel 2（连接通道：对应客户端B的TCP连接，传输数据）
+│     └─ ...
+├─ Worker 2（EventLoop线程：处理I/O事件，驱动Selector）
+│  └─ ...
+└─ ...
+```
+
+WorkerGroup 负责把 Channel 交给不太忙的的 Worker 线程，所以每个 Worker 线程可能负责大量的 Channel。
+
+每个 Worker 线程本质是 `EventLoop` 线程，循环调用 `Selector.select()` 监听多个 Channel 的 I/O 事件， Worker 线程从 Selector.select() 拿到已经准备好了的 I/O 事件和对应的 Channel 集合，然后 Worker 线程逐个处理这些事件。
+
+处理完这些事件后，再次进入循环调用 `Selector.select()` 重复上一步。
+
+>`EventLoop` 是指单个线程以无限循环的方式不断按一定的流程处理任务。
+
+当 Worker 线程处理就绪事件时，如果事件处理非常耗时（比如超过 1 秒，甚至几分钟），会引发一系列连锁性的严重性能问题，本质原因是**单线程循环被阻塞，导致后续所有依赖该线程的操作无法执行**。
+
+举个例子：
+Worker 线程解析到一个 I/O 事件，这是一个耗时1分钟的业务请求。那么同一批还未处理的事件/需要由下轮循环才能获取的就绪事件都需要等很久才被处理，可能会导致对应的客户端一直没有收到响应，从而超时断开连接、发送冗余请求等。
+
+这一系列的连锁反应会使整个服务器的吞吐量暴跌，出现假死（进程没崩溃，但大部分客户端的请求无响应）。
+
+Q: 耗时的工作总得处理啊，怎么办？
+A: 那就再创建一个业务线程池，把耗时的工作由 WorkerGroup 转交给他就行了。
+
+# 业务线程池
+
+当 WorkerGroup 完成数据的读取和编解码后，就需要处理具体的业务逻辑了（如校验数据、操作数据库、调用 RPC 服务）。
+这些操作往往耗时较长（毫秒级甚至秒级），如果放在 Worker 线程中执行，会阻塞 I/O 处理。因此需要一个专门的业务线程池来承载这些重活。
 
 线程数量分配：
 - CPU 密集型：以 “CPU 核心数” 为基准；
