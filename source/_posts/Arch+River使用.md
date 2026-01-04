@@ -39,6 +39,7 @@ bar: Waybar -> dam
 背光调节: brightnessctl -> 自定义脚本，见 dotfile 仓库: `.local/bin`
 监控: htop -> btop
 浏览器: Firefox -> Firefox + Chromium
+字体：增加 `ttf-hack` 为 monopace 首选
 
 增加了 KVM，因为去工作了，需要用到一堆 Window 专用的软件
 
