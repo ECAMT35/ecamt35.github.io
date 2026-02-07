@@ -249,7 +249,7 @@ noticeOutdate:
   # Style: simple / flat
   style: flat
   # When will it be shown
-  limit_day: 365
+  limit_day: 90
   # Position: top / bottom
   position: top
   message_prev: It has been

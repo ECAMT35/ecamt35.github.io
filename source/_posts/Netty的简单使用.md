@@ -1,6 +1,7 @@
 ---
 title: Netty的简单使用
 date: 2025-10-06 00:00:00
+updated: 2025-10-06 00:00:00 
 description: Netty的使用记录
 categories: 
 - 技术理论
@@ -9,6 +10,9 @@ tags:
 - WebSocket
 - NIO
 ---
+
+> Netty 4.2.9 中已更换部分相关接口，本文章代码部分已过期。另外业务线程池部分现在可以被Java的虚拟线程取代了
+
 **Netty的主从Reactor多线程模型**：BossGroup 处理连接请求，WorkerGroup 处理I/O操作。
 
 Netty 一般需要两个必须的线程组 + 一个可选的自定义业务线程池来完成工作：
