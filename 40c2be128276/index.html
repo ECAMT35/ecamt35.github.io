@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>如何保证MQ消息顺序性 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="如何保证MQ消息顺序性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何保证MQ消息顺序性">
+<meta property="og:url" content="http://ecamt35.github.io/40c2be128276/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="如何保证MQ消息顺序性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2025-10-31T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-10T09:33:55.157Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="MQ">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "如何保证MQ消息顺序性",
+  "url": "http://ecamt35.github.io/40c2be128276/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2025-10-31T16:00:00.000Z",
+  "dateModified": "2026-02-10T09:33:55.157Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/40c2be128276/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '如何保证MQ消息顺序性',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">如何保证MQ消息顺序性</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">如何保证MQ消息顺序性</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-31T16:00:00.000Z" title="发表于 2025-11-01 00:00:00">2025-11-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-10T09:33:55.157Z" title="更新于 2026-02-10 17:33:55">2026-02-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%90%86%E8%AE%BA/">技术理论</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-02-10 17:33:55&quot;}" hidden></div><p>参考：</p>
+<p><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV13mW4zzEDs/">怎么保证mq消息顺序性？保证不了</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/wzh2010/p/15888528.html">MQ系列12：如何保证消息顺序性</a></p>
+<p>消息的有序性在很多业务场景中占有很重要的位置。<br>比如购物场景，需要按照 创建订单 -&gt; 订单付款 -&gt; 完成订单 顺序执行。<br>又比如出行场景，接单 -&gt; 接送到达目的地 -&gt; 付款 -&gt; 完成订单。<br>这种是严格按照顺序执行的，这样的顺序消费才不会出问题，而且各个订单之间是互相独立和并行执行的。<br>所以，在 MQ 中，如何稳定地保证顺序性消息处理，是一个不可避免的话题。</p>
+<h1 id="消息的顺序性说明"><a href="#消息的顺序性说明" class="headerlink" title="消息的顺序性说明"></a>消息的顺序性说明</h1><p>消息的有序执行，一般不是单个组件的能力。而是整个消息从生产，排队，存储到消费都是有序的，比如上面提到的购物和出行场景。</p>
+<p>这就要求我们在消息队列（无论是 Kafka、RocketMQ 还是 RabbitMQ）中，保证以下前提：</p>
+<ul>
+<li>消息生产的有序性：即生产者组件有序发送消息。</li>
+<li>消息入出队列的有序性：消息需严格按照进入队列的先后顺序入队和出队，遵循 FIFO 原则。</li>
+<li>消息的存储的有序性：与上一点一致，部分场景下为提高可靠性需持久化到磁盘，这时候应该遵循有序存放，才能保证后续有序消费。</li>
+<li>消息消费的有序性：即按照顺序进行消费。又分为全局顺序消息与局部顺序消息，全局是指 Topic 下的所有消息都要保证顺序；局部顺序消息保证每一组消息被顺序消费即可。</li>
+</ul>
+<h2 id="全局有序和局部有序"><a href="#全局有序和局部有序" class="headerlink" title="全局有序和局部有序"></a>全局有序和局部有序</h2><p><strong>全局有序是所有消息按发送顺序消费，局部有序是指定业务维度的消息按顺序消费</strong></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>定义</th>
+<th>业务场景</th>
+<th>实现成本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>全局有序</td>
+<td>所有消息严格遵循 “发送顺序 &#x3D; 消费顺序”</td>
+<td>股票交易行情（需全量按时间排序）</td>
+<td>极高（仅单队列 + 单消费者）</td>
+</tr>
+<tr>
+<td>局部有序</td>
+<td>同一业务标识（如订单 ID、用户 ID）的消息按顺序消费</td>
+<td>电商订单（下单→支付→发货）、外卖订单（下单→接单→配送）</td>
+<td>较低（多队列 + 按业务 ID 路由）</td>
+</tr>
+</tbody></table>
+<p>大多数业务无需追求全局有序，只需保证局部有序（如同一订单、同一用户的消息顺序）。</p>
+<p>举个例子：<br>外卖平台无需保证 “用户 A 的下单消息” 和 “用户 B 的下单消息” 的顺序（保证了也没有什么意义，因为两个订单是否全局有序执行不会有任何影响），但必须保证 “用户 A 的下单 → 接单 → 配送” 三条消息按顺序消费。若 “配送” 消息先被处理，会出现 “订单还没被接单就开始配送” 的逻辑错误。</p>
+<p>如果想让全局都是顺序性消费，那么只能用一个消费者去消费队列（一般来说也是单个生产者），这是会严重影响整体性能的。</p>
+<p>所以接下来的内容主要围绕局部有序这个需求进行。</p>
+<h1 id="消息有序性的核心"><a href="#消息有序性的核心" class="headerlink" title="消息有序性的核心"></a>消息有序性的核心</h1><h2 id="MQ存储消息的有序性"><a href="#MQ存储消息的有序性" class="headerlink" title="MQ存储消息的有序性"></a>MQ存储消息的有序性</h2><p>消息队列（MQ）本身的特性决定了其存储的顺序性能力：</p>
+<ul>
+<li>单队列&#x2F;分区的 FIFO 特性：同一队列&#x2F;分区的消息存储和投递遵循先进先出原则，MQ 会将同一队列的消息按投递顺序持久化到磁盘</li>
+<li>跨队列&#x2F;分区的无序性：不同队列&#x2F;分区间的消息可能存在网络延迟差异，MQ本身不保证跨队列&#x2F;分区的全局顺序</li>
+</ul>
+<p>所以按顺序发送到 MQ 单队列的消息，取出的时候也是有序的，不需要我们额外做些什么。<br>我们只需要保证消息的生产和消费时的顺序性就行了。</p>
+<h2 id="消息生产的有序性"><a href="#消息生产的有序性" class="headerlink" title="消息生产的有序性"></a>消息生产的有序性</h2><p>要保证整个消息队列的有序性执行，首先要保证消息生产的有序性。<br>一个完整的过程如果被分配到了不同的队列&#x2F;分区，这可能是消息乱序的起点。</p>
+<p>举个例子：<br>一次完整的消费过程：创建订单、付款、完成订单<br>如果这三个消息分别在三个不同的队列，那这三个步骤可以说是并行执行的，很可能 “完成订单” 反而先被消费，发生逻辑错误。</p>
+<p>所以我们必须保证一组顺序的消息都存入同一个队列&#x2F;分区中。</p>
+<p>方案如下：<br><strong>自定义路由算法，让需有序的消息进入同一队列</strong></p>
+<ul>
+<li>一个订单的多个子消息的父订单号是一致，我们把这些消息按照订单号取模，投送到对应的 Queue 中就行了，比如 订单号 % 队列数量（ 163105015 % 9）</li>
+<li>发送消息自定义消息标签（消息标签可以用队列编号命名），一组消息使用同一个标签，该组标签对应的消息都投向标签所在的队列。</li>
+</ul>
+<p>我们可以定义多个队列&#x2F;分区，多个队列同时存在，也意味着可以存在多个消费者。这显然比全局有序需要满足的条件 ”只允许单个队列-单个消费者“ 性能将会更好。</p>
+<h2 id="消息消费的有序性"><a href="#消息消费的有序性" class="headerlink" title="消息消费的有序性"></a>消息消费的有序性</h2><p>既然消息生产和消息持久化都可以做到有序性。那么只要保证消费的有序性，就能保证整个消息队列的有序执行。</p>
+<p>方案如下：<br><strong>每个队列只能由一个消费者消费</strong></p>
+<p>每个 MQ 消息队列只能由一个消费者消费的话，这个消费者最终能拿到MQ消息队列中所有的消息，所以拿到的消息在总体上是有序的（FIFO），可避免多消费者拆分队列导致的顺序混乱。</p>
+<p>每个队列只能由一个消费者消费的方案虽能保证顺序，但会导致性能瓶颈 —— 若队列中消息量过大，单个消费者串行处理会造成消息积压。</p>
+<p>单消费者效率低的问题也有可行的解决方案：<br><strong>消费者内部维护多个阻塞队列，把同一业务 ID 消息投递到同一个阻塞队列，每个阻塞队列单线程串行，多个阻塞队列并行处理</strong>。</p>
+<p>注意事项：</p>
+<ol>
+<li>阻塞队列需单线程串行处理，可以绑定阻塞队列和独立线程来实现。通过多个阻塞队列并行的方式达到多线程的效果。（否则这与多个消费者消费同一个 MQ 队列没有什么区别了）</li>
+<li>当然这种方法要注意对 MQ 进行 ACK 的时机，因为要放到阻塞队列里面执行，所以 ACK 机制必须换成手动 ACK。时机是从阻塞队列取出消息并处理成功后。</li>
+<li>RabbitMQ 的 <code>prefetch</code> 机制控制的是未 ACK 消息的最大数量（预取数），只要未 ACK 消息数低于 <code>prefetch</code> 上限，即使有未处理完成的消息，消费者也会拉取新消息补充到额度上限，不会等待所有消息处理完。（比如设置 <code>prefetch=5</code>，目前有 3 条同时 ACK，另两条未 ACK，消费者不会等待另外两条消息任务执行完成才向 MQ 一下子获取 5 条新消息，而是 ACK 之后检查未 ACK 最大数量，小于 <code>prefetch</code> 则立即获取新消息补至预取上限）</li>
+</ol>
+<h1 id="导致乱序的其他因素"><a href="#导致乱序的其他因素" class="headerlink" title="导致乱序的其他因素"></a>导致乱序的其他因素</h1><h2 id="扩容缩容导致乱序"><a href="#扩容缩容导致乱序" class="headerlink" title="扩容缩容导致乱序"></a>扩容缩容导致乱序</h2><p>上述的保证局部有序较高性能的方案，是绝对不能随便对队列进行扩容缩容的。<br>一旦扩容缩容，消息队列数量就变化了，从而导致本该在一个队列的消息被分配到不同的队列。</p>
+<p>举个例子：<br>“下单” 消息已经分配到队列1，在投递 “支付” 消息前，此时发生扩容，可能导致 “支付” 消息被分配到队列2，上述也说了消息如果不在同一个 MQ 消息队列&#x2F;分区，是不能保证顺序性的。</p>
+<p>所以最好是先把队列数量固定。或者把出现乱序的同一业务 ID 的所有消息重新投递到特殊的队列处理（这个队列做好完全的顺序检查，可以重复入队等来保证消息的顺序执行）。或者双写过渡，先同时向新旧队列写入消息，待旧队列消息消费完毕后，再停止向旧队列写入、开启新队列的消费。</p>
+<h2 id="Rebalance导致乱序"><a href="#Rebalance导致乱序" class="headerlink" title="Rebalance导致乱序"></a>Rebalance导致乱序</h2><p>MQ 的 “Rebalance” 机制（如 Kafka 的消费者组重平衡）会在 “消费者数量变化”（如下线、新增消费者）时，重新分配 “消费者 - 队列” 的绑定关系。若原消费某队列的消费者被分配到新队列，历史消息与新消息会被不同消费者处理，引发乱序。</p>
+<h2 id="消息重试导致乱序"><a href="#消息重试导致乱序" class="headerlink" title="消息重试导致乱序"></a>消息重试导致乱序</h2><p>消息重试也会破坏顺序性。当消息处理失败或者被拒绝时，MQ 会将消息重新入队（当做新的消息被放到当前队列末尾），若此时重试消息（第一顺序执行的消息）排在新消息（如第二顺序才执行的消息）之后，会导致需要有序消费的消息乱序。</p>
+<p>因此消息消费失败只能进行本地重试-&gt;死信队列，不能把消息放回到MQ队列重试。</p>
+<p>如果采用消费者内部维护阻塞队列的方案，只允许线程内同步重试，处理消息的单线程在当前消息处理失败后，直接在当前上下文循环重试（如最多3次），重试期间不处理阻塞队列的下一条消息。从而避免消息重新入队阻塞队列，打乱阻塞队列中消息的顺序。</p>
+<h2 id="兜底措施"><a href="#兜底措施" class="headerlink" title="兜底措施"></a>兜底措施</h2><p>最好把 MQ 看作不太可靠的中间件，不要全依靠 MQ 保证有序性和可靠性。</p>
+<p>不依靠 MQ 队列实现有序性，就需要在消费消息的时候进行业务检查，如：</p>
+<ol>
+<li>保证消息消费的幂等性；</li>
+<li>检查上一个顺序消息是否被消费完成，没有被消费完成的话本消息可以选择重新投递到 MQ 队列消息&#x2F;死信队列，也可以先尝试重入消费者内部的阻塞队列。</li>
+<li>开启定时任务检查对应的数据，做好补偿策略等。</li>
+</ol>
+<p>上述方法可以作为兜底，全做好了也可以完全不依靠 MQ 来保证有序性和可靠性。但是这种全面检查肯定是需要时间和资源的，在高并发的情况下不太适用。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li><strong>自定义路由算法，让需有序的消息进入同一队列</strong></li>
+<li><strong>每个队列只能由一个消费者消费</strong></li>
+<li><strong>消费者内部维护多个阻塞队列，把同一业务 ID 消息投递到同一个阻塞队列，每个阻塞队列单线程串行，多个阻塞队列并行处理</strong></li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/40c2be128276/">http://ecamt35.github.io/40c2be128276/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/MQ/">MQ</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/b0f908175cdc/" title="Netty的简单使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Netty的简单使用</div></div><div class="info-2"><div class="info-item-1">Netty的使用记录</div></div></div></a><a class="pagination-related" href="/b62e44ed24b2/" title="使用Netty+java完成简单的RPC实现"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">使用Netty+java完成简单的RPC实现</div></div><div class="info-2"><div class="info-item-1">使用Netty+java完成简单的RPC实现</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E7%9A%84%E9%A1%BA%E5%BA%8F%E6%80%A7%E8%AF%B4%E6%98%8E"><span class="toc-number">1.</span> <span class="toc-text">消息的顺序性说明</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%A8%E5%B1%80%E6%9C%89%E5%BA%8F%E5%92%8C%E5%B1%80%E9%83%A8%E6%9C%89%E5%BA%8F"><span class="toc-number">1.1.</span> <span class="toc-text">全局有序和局部有序</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E6%9C%89%E5%BA%8F%E6%80%A7%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">2.</span> <span class="toc-text">消息有序性的核心</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#MQ%E5%AD%98%E5%82%A8%E6%B6%88%E6%81%AF%E7%9A%84%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-number">2.1.</span> <span class="toc-text">MQ存储消息的有序性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E7%94%9F%E4%BA%A7%E7%9A%84%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-number">2.2.</span> <span class="toc-text">消息生产的有序性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E6%B6%88%E8%B4%B9%E7%9A%84%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-number">2.3.</span> <span class="toc-text">消息消费的有序性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%BC%E8%87%B4%E4%B9%B1%E5%BA%8F%E7%9A%84%E5%85%B6%E4%BB%96%E5%9B%A0%E7%B4%A0"><span class="toc-number">3.</span> <span class="toc-text">导致乱序的其他因素</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%A9%E5%AE%B9%E7%BC%A9%E5%AE%B9%E5%AF%BC%E8%87%B4%E4%B9%B1%E5%BA%8F"><span class="toc-number">3.1.</span> <span class="toc-text">扩容缩容导致乱序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Rebalance%E5%AF%BC%E8%87%B4%E4%B9%B1%E5%BA%8F"><span class="toc-number">3.2.</span> <span class="toc-text">Rebalance导致乱序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%87%8D%E8%AF%95%E5%AF%BC%E8%87%B4%E4%B9%B1%E5%BA%8F"><span class="toc-number">3.3.</span> <span class="toc-text">消息重试导致乱序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%9C%E5%BA%95%E6%8E%AA%E6%96%BD"><span class="toc-number">3.4.</span> <span class="toc-text">兜底措施</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术">Linux虚拟网络化与隔离技术</a><time datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/15c78de5d315/" title="Raft阅读随记">Raft阅读随记</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9a0e6259ac11/" title="浅读Raft算法">浅读Raft算法</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/6d8e2f58e408/" title="Arch+River 使用">Arch+River 使用</a><time datetime="2026-01-01T10:30:00.000Z" title="发表于 2026-01-01 18:30:00">2026-01-01</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

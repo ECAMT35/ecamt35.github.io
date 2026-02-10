@@ -1,0 +1,459 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Raft阅读随记 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="记录阅读Raft时的一些疑问及思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raft阅读随记">
+<meta property="og:url" content="http://ecamt35.github.io/15c78de5d315/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="记录阅读Raft时的一些疑问及思考">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2026-02-02T03:30:00.000Z">
+<meta property="article:modified_time" content="2026-02-10T09:33:55.135Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="分布式系统">
+<meta property="article:tag" content="Raft">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Raft阅读随记",
+  "url": "http://ecamt35.github.io/15c78de5d315/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2026-02-02T03:30:00.000Z",
+  "dateModified": "2026-02-10T09:33:55.135Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/15c78de5d315/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Raft阅读随记',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">Raft阅读随记</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Raft阅读随记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-10T09:33:55.135Z" title="更新于 2026-02-10 17:33:55">2026-02-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%90%86%E8%AE%BA/">技术理论</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">8.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>26分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-02-10 17:33:55&quot;}" hidden></div><h1 id="Raft-特性总结"><a href="#Raft-特性总结" class="headerlink" title="Raft 特性总结"></a>Raft 特性总结</h1><p>集群任何时候，都将满足以下特性：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>选举安全特性</td>
+<td>对于一个给定的任期号，最多只会有一个领导者被选举出来</td>
+</tr>
+<tr>
+<td>领导者只附加原则</td>
+<td>领导者绝对不会删除或者覆盖自己的日志，只会追加新条目</td>
+</tr>
+<tr>
+<td>日志匹配原则</td>
+<td>如果两个日志在相同索引位置包含一个具有相同任期号的条目，那么这两个日志在该索引位置之前的所有条目都完全相同</td>
+</tr>
+<tr>
+<td>领导者完全特性</td>
+<td>如果某个日志条目在某个任期号中已经被提交，那么这个条目必然出现在更大任期号的所有领导者中</td>
+</tr>
+<tr>
+<td>状态机安全特性</td>
+<td>如果某一服务器已将给定索引位置的日志条目应用至其状态机中，则其他任何服务器在该索引位置不会应用不同的日志条目</td>
+</tr>
+</tbody></table>
+<h1 id="Raft-基础"><a href="#Raft-基础" class="headerlink" title="Raft 基础"></a>Raft 基础</h1><h2 id="复制状态机"><a href="#复制状态机" class="headerlink" title="复制状态机"></a>复制状态机</h2><p>复制状态机包括 共识算法，状态机，日志。多个服务器的这三者组成复制状态机，形成 raft group。</p>
+<p>目的是为了让服务器形成一个单独的，高度可靠的状态机。</p>
+<h2 id="拜占庭将军问题"><a href="#拜占庭将军问题" class="headerlink" title="拜占庭将军问题"></a>拜占庭将军问题</h2><p>拜占庭将军问题：<strong>在存在消息丢失的不可靠信道上试图通过消息传递的方式达到一致性是不可能的</strong>。<strong>拜占庭将军中可能存在叛徒，发送虚假的消息；即节点故意试图破坏系统，故意发送错误的或破坏性的响应</strong>。例如节点明明没有收到某条消息，但却对外声称收到了。这种行为称为拜占庭故障。在这样不信任的环境中需要达成共识的问题也被称为拜占庭将军问题。</p>
+<p>Raft 算法不解决拜占庭将军问题，默认节点无恶意，仅可能出现崩溃故障。</p>
+<h2 id="高可用而不是完全可用"><a href="#高可用而不是完全可用" class="headerlink" title="高可用而不是完全可用"></a>高可用而不是完全可用</h2><p>Raft 算法存在可用性限制，它实现的是高可用，而非完全可用。例如，5 个服务器组成的集群，最多允许 2 个服务器宕机，剩余 3 个正常节点可维持集群正常工作；若宕机节点数超过容错阈值，集群将无法提供服务。</p>
+<h2 id="CAP-理论：CP"><a href="#CAP-理论：CP" class="headerlink" title="CAP 理论：CP"></a>CAP 理论：CP</h2><p>CAP 理论：P 一定成立，在 C 和 A 中只有一个能成立。<br>Raft 算法属于 CP 模型，优先保证一致性，且其一致性为强一致性（即线性一致性）——集群中所有节点对同一请求的响应，始终与“单节点处理该请求”的结果一致。</p>
+<h1 id="Raft-算法核心"><a href="#Raft-算法核心" class="headerlink" title="Raft 算法核心"></a>Raft 算法核心</h1><h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><h3 id="提交之前任期内的日志条目"><a href="#提交之前任期内的日志条目" class="headerlink" title="提交之前任期内的日志条目"></a>提交之前任期内的日志条目</h3><p>Raft 中的所有讨论，提交都是一个单点的状态，而非集群的状态。</p>
+<p>会不会出现这种情况：Leader 和 follower 提交之间必然会间隔一段时间，如果 Leader 提交之后直接返回客户端，在通知 follower 提交之前，也就是一个心跳的时间之内，在此时 Leader 宕机了，是不是就可能会出现返回 client 成功，但是提交状态在集群上没有被保留？</p>
+<p>这个问题可以用 Raft 的两个机制解决：</p>
+<ul>
+<li>请求投票 RPC 中包含了候选人的日志信息，然后投票人会拒绝掉那些日志没有自己新的投票请求。判断方式是通过比较两份日志中最后一条日志条目的任期号、索引值和任期号比较谁的日志更新。</li>
+<li>Raft 永远不会通过计算副本数目的方式去提交一个之前任期内的日志条目。只有领导人当前任期里的日志条目通过计算副本数目可以被提交；一旦当前任期的日志条目以这种方式被提交，那么由于日志匹配特性，之前的日志条目也都会被间接的提交。</li>
+</ul>
+<p>客户端的成功响应是有效的，集群必然保留提交状态。</p>
+<p>因为如果 Leader 未复制到半数以上节点就宕机了，那么即使一个未复制该条目的跟随者也能获得选举成为 Leader，因为完成复制该日志条目的节点只是少数派，该日志条目即使被下一个领导者覆盖掉也是合法的。</p>
+<p>但是，若此时半数以上节点已经持久化复制了该日志，Leader 仅本地提交了日志、没来得及通知跟随者就宕机，那么下一个 Leader 只会从已复制该日志的跟随者选出，并且该日志最终会被提交。<br>因为即使有一个未复制该日志的节点率先选举超时发起投票，该节点的选举必然失败：因为该节点成为候选人后，仅会将<strong>竞选任期</strong>递增，即使其最后的日志条目任期与多数节点一致，但因少复制了一条日志导致日志最后索引更短，会被大部分节点拒绝投票，更别说有覆盖日志的能力了。<br>所以<strong>下一个 Leader 必然是拥有旧任期的日志条目</strong>。</p>
+<p>要记得，Raft 中只有当前任期的日志条目才可直接通过计算副本数目确认提交；旧任期日志若被当前 Leader 提交，必然是通过当前任期的日志间接提交，这也意味着当前任期已有日志被复制到半数以上节点，半数以上节点的日志任期与长度必然是最新最长的。<br>而 Raft 通过当前任期的日志条目提交，之前的日志条目也都会被间接的提交的机制，不会被其他情况导致该之前任期已复制到多数派节点的日志条目被覆盖。</p>
+<p>所以这个日志条目最终还是会被提交，并不会出现返回 client 成功，但是提交状态在集群上没有被保留的情况。</p>
+<h3 id="可用性与时间依赖"><a href="#可用性与时间依赖" class="headerlink" title="可用性与时间依赖"></a>可用性与时间依赖</h3><blockquote>
+<p>Raft 的安全性不能依赖时间；但可用性（系统可以及时的响应客户端）不可避免的要依赖于时间。如果消息交换比服务器故障间隔时间长，候选人将没有足够长的时间来赢得选举；没有一个稳定的领导人，Raft 将无法工作。</p>
+</blockquote>
+<p>先回顾一下 Raft 的选举流程：<br>超时的触发，严格以「节点收到上一次合法心跳（AppendEntries RPC）的时间」为基准；若超过选举超时时间未收到任何合法心跳（或有效 Candidate 的 RequestVote RPC），则该 Follower 转为 Candidate 并发起选举。</p>
+<p>案例：节点瞬断瞬启，平均故障间隔时间 &lt; 选举超时时间，导致系统可用性问题。</p>
+<p>集群状态：<br>5 节点集群（<code>S1~S5</code>），S1 是 Leader，选举超时配置 <code>150~300ms</code> 随机（假设 S5 一直是最短的选举超时时间）。Leader 发送心跳的时间间隔为 50ms，且只需要 5ms 内就能到达所有跟随者；跟随者节点期望下次收到心跳时间间隔在 <code>50+5ms容忍时间</code> 内。</p>
+<p>集群动作：</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>S1 状态</th>
+<th>S5 上次收心跳</th>
+<th>期望最晚接收</th>
+<th>计时长</th>
+<th>剩余超时</th>
+<th>集群行为</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0ms</td>
+<td>首次发心跳</td>
+<td>-</td>
+<td>-</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>集群初始化，S1 向全节点发送首次心跳</td>
+</tr>
+<tr>
+<td>5ms</td>
+<td>正常运行</td>
+<td>5ms</td>
+<td>60ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>全节点 5ms 收到心跳，首次更新收心跳时间，重置选举计时器，计算首次期望最晚 60ms</td>
+</tr>
+<tr>
+<td>50ms</td>
+<td>正常运行</td>
+<td>5ms</td>
+<td>60ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>S1 按 50ms 间隔发第 2 次心跳，符合配置</td>
+</tr>
+<tr>
+<td>55ms</td>
+<td>正常运行</td>
+<td>55ms</td>
+<td>110ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>全节点 55ms 收到心跳，更新收心跳时间，重置计时器，重新计算期望最晚 110ms</td>
+</tr>
+<tr>
+<td>95ms</td>
+<td>突发宕机</td>
+<td>55ms</td>
+<td>110ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>S1 停止发第 3 次心跳，跟随者暂未感知（未到 110ms 最晚时间）</td>
+</tr>
+<tr>
+<td>110ms</td>
+<td>宕机中</td>
+<td>55ms</td>
+<td>110ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>到达期望最晚接收时间，S5<strong>正式启动选举计时器</strong>，计时长从 0 开始累计</td>
+</tr>
+<tr>
+<td>195ms</td>
+<td>重启完成</td>
+<td>55ms</td>
+<td>110ms</td>
+<td>85ms</td>
+<td>65ms</td>
+<td>S1 宕机 100ms 后重启，立即发送<strong>旧 Term 合法心跳</strong>（Term 未变，合法）</td>
+</tr>
+<tr>
+<td>200ms</td>
+<td>重启稳定</td>
+<td>200ms</td>
+<td>255ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>全节点 200ms 收到心跳（195+5），<strong>强制重置所有计时</strong>，更新收心跳时间 + 重新计算期望最晚 255ms</td>
+</tr>
+<tr>
+<td>250ms</td>
+<td>正常发心跳</td>
+<td>200ms</td>
+<td>255ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>S1 按 50ms 间隔发重启后第 1 次心跳</td>
+</tr>
+<tr>
+<td>255ms</td>
+<td>正常运行</td>
+<td>255ms</td>
+<td>310ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>全节点 255ms 收到心跳，更新收心跳时间，重置计时器，计算期望最晚 310ms</td>
+</tr>
+<tr>
+<td>305ms</td>
+<td>再次宕机</td>
+<td>255ms</td>
+<td>310ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>S1 停止发下一次心跳，跟随者暂未感知（未到 310ms 最晚时间）</td>
+</tr>
+<tr>
+<td>310ms</td>
+<td>宕机中</td>
+<td>255ms</td>
+<td>310ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>到达期望最晚接收时间，S5<strong>再次启动选举计时器</strong>，计时长从 0 开始累计</td>
+</tr>
+<tr>
+<td>405ms</td>
+<td>再次重启完成</td>
+<td>255ms</td>
+<td>310ms</td>
+<td>95ms</td>
+<td>55ms</td>
+<td>S1 宕机 100ms 后重启，立即发送<strong>旧 Term 合法心跳</strong></td>
+</tr>
+<tr>
+<td>410ms</td>
+<td>重启稳定</td>
+<td>410ms</td>
+<td>465ms</td>
+<td>0ms</td>
+<td>150ms</td>
+<td>全节点 410ms 收到心跳（405+5），强制重置所有计时，更新时间 + 计算新期望最晚 465ms</td>
+</tr>
+</tbody></table>
+<p>所以，Raft 可以选举并维持一个稳定的领导人，只要系统满足下面的时间要求：</p>
+<blockquote>
+<p>广播时间（broadcastTime） &lt;&lt; 选举超时时间（electionTimeout） &lt;&lt; 平均故障间隔时间（MTBF）</p>
+</blockquote>
+<h1 id="集群成员变化"><a href="#集群成员变化" class="headerlink" title="集群成员变化"></a>集群成员变化</h1><h2 id="自动配置变更的流程"><a href="#自动配置变更的流程" class="headerlink" title="自动配置变更的流程"></a>自动配置变更的流程</h2><p>集群配置对每个节点来说，就是一份本地持久化的「集群有效成员白名单 + 规则表」，核心包含两个关键信息：</p>
+<ul>
+<li><strong>集群所有有效节点的唯一标识</strong>：通常是「节点 ID + 固定网络地址（IP + 端口）」；</li>
+<li><strong>基于当前成员数量的共识规则</strong>：比如多少节点算多数派（3 节点需 2 票、4 节点需 3 票、5 节点需 3 票），这是节点自动根据成员数量计算的，无需手动配置。</li>
+</ul>
+<p><strong>每个节点一旦将新配置条目添加到自身的日志中，新配置便立即在该节点生效</strong>：C<sub>new</sub> 条目会被复制到新配置包含的所有节点，且系统会以新配置下的多数派节点为依据，判定该 C<sub>new</sub> 条目是否提交。这意味着节点无需等待配置条目完成提交，而是始终使用自身日志中最新的配置。</p>
+<p>当 C<sub>new</sub>​ 条目完成提交时，本次配置变更即宣告完成。此时领导者能够确认：新配置 C<sub>new</sub> ​已被多数派的新配置节点采纳；同时也能确定，所有未切换至 C<sub>new</sub> ​的节点已无法构成集群的多数派，且未采纳 C<sub>new</sub> ​的节点也无法被选举为领导者。C<sub>new</sub>​ 的提交使得以下三类操作可以正常执行：</p>
+<ol>
+<li>领导者可向请求方确认配置变更已成功完成；</li>
+<li>若本次配置变更涉及节点移除，则被移除的节点可被下线；</li>
+<li>可启动后续的配置变更操作。在此之前，若叠加执行配置变更，可能会导致集群陷入图 10 所示的不安全状态。</li>
+</ol>
+<h2 id="配置不一致形成多个独立子集群"><a href="#配置不一致形成多个独立子集群" class="headerlink" title="配置不一致形成多个独立子集群"></a>配置不一致形成多个独立子集群</h2><p>形成过程（不使用联合共识机制，且一次性增减多个节点的结果）：</p>
+<p><img src="/15c78de5d315/raft-%E5%9B%BE10.png" alt="图 10"></p>
+<p>在上图例子中，集群配额从 3 台机器（排除 Leader）变成了 5 台。其中 S1&#x2F;S2&#x2F;S3 是老节点，S4&#x2F;S5 是新增节点。假设扩容前 C<sub>old</sub> 的 Leader 为 S3。</p>
+<blockquote>
+<p>S1&#x2F;S2 不会是老集群的 Leader，因为他们的日志都没有新配置，一个节点如果接收到新配置日志条目，会立即应用。</p>
+</blockquote>
+<p>可能存在某一个时间点（箭头处），S1&#x2F;S2 仍然是老配置，视为在老集群，S3&#x2F;S4&#x2F;S5 是新配置，视为已经在新集群。（节点的方框处在绿色意味老配置，蓝色为已切换为新配置。这个时间点，S3 已切换至新配置，但仍维持原 Leader 身份，向所有节点发送心跳。）</p>
+<p>这时候 Leader 突然宕机了，那么节点们收不到心跳选举超时发起投票。<br>在这个时候，节点们因配置不同，可以看成两个集群：</p>
+<ul>
+<li>C<sub>old</sub> ：包含 S1&#x2F;S2&#x2F;S3，多数派阈值为 2；</li>
+<li>C<sub>new</sub> ：包含 S1&#x2F;S2&#x2F;S3&#x2F;S4&#x2F;S5，多数派阈值为 3；</li>
+</ul>
+<p>C<sub>old</sub> 选举 Leader：S1 先达到选举超时时间，将自身任期加 1，并发起投票请求。这时 S3 无响应，但 S1 凭借自身与 S2 的投票成为 Leader。（S1&#x2F;S2 因老配置，会忽视 S4&#x2F;S5 的投票请求，也不会向 S4&#x2F;S5 发出投票请求）</p>
+<p>与此同时，C<sub>new</sub> 的选举也在进行：S4 达到选举超时时间，发起投票请求。S4 基于新配置，向认知中的集群成员（S1&#x2F;S2&#x2F;S3&#x2F;S4&#x2F;S5）发送投票请求。其中 S1&#x2F;S2 已归属于老集群，收到请求后，并不认可新配置的集群成员范围，直接拒绝投票；S3 宕机无响应；仅 S5 收到请求。所以 S4 只能得到自身与 S5 的投票共 2 票。未达到新配置多数派阈值（3），选举暂时失败，进入下一轮超时倒计时。若此时刚好 S3 恢复，将直接改变新配置集群的选举格局。S3&#x2F;S4&#x2F;S5 必然能选出一个新的节点作为 Leader，因为投票已经可以满足多数派阈值，此时出现第二个 Leader。此处假设 S5 成为 Leader。</p>
+<p>此时老配置集群中，S1（Leader）仍向 S2 发送心跳，维持自身 Leader 身份，但 S1、S2 仅认可老配置，不会响应 S5 的心跳或日志同步请求；S5 作为新配置集群 Leader，也不会认可 S1 的 Leader 身份，仅向新配置节点（S3、S4）同步日志、发送心跳，集群分裂状态暂时保留。最终形成了两个独立子集群各有一个 Leader，产生数据不一致的情况。</p>
+<p>解决方案有两个：</p>
+<ul>
+<li>二阶段协议（联合共识）：先同步 “新旧配置共存” 的联合配置，所有决议需同时满足新旧配置多数派（老≥2 票、新≥3 票），阻断局部选举；待联合配置全量确认后，再切换至新配置，从根源避免双认知集群。</li>
+<li>单节点变更机制：<strong>当仅向集群添加&#x2F;移除一个节点时，旧集群的任意多数派与新集群的任意多数派之间必然存在重叠，以此保证安全性</strong>。</li>
+</ul>
+<p>这里只说 Raft 论文推荐的是更易于理解、简单的单节点变更机制：</p>
+<p><img src="/15c78de5d315/4_3.png" alt="图 4.3"></p>
+<p>无论原集群是基&#x2F;偶数节点，单节点变更机制都是安全的。<br>假设这个机制是不安全的，反向推演，你会发现：如果要分裂出两个独立的集群，那么必须有一个节点既给 C<sub>old</sub> 的候选人投了票，又给了 C<sub>new</sub> 的候选人投了票。这个做法是有矛盾的：每一个节点都会持久化当前的任期和投票选择，只会给一个候选者投票。</p>
+<p>如在 4 节点的原集群（多数派阈值为 3）加入一个节点成为 5 节点的集群（多数派阈值为 3），只有当集群有 6 个节点时（每个节点只能投一票）某一时刻新旧集群才能各自选出自己的 Leader，但此时是不可能的，因为整个集群只有 5 个节点。所以必须要有一个节点投出两票分别给新旧集群，而在上文已经论述了，这种情况也是不可能发生的。</p>
+<p>当然，如果要添加新的 2 个节点成为新集群，那肯定要拆分为一个一个地添加，并且再次添加节点时，需要前一个添加请求被多数派节点复制、提交日志。否则依旧是不安全的更改集群配置。</p>
+<h2 id="新节点日志追平"><a href="#新节点日志追平" class="headerlink" title="新节点日志追平"></a>新节点日志追平</h2><p>更新集群配置后，如加入新节点，新节点的日志是空白的。如果是个 4 节点集群 S1&#x2F;S2&#x2F;S3&#x2F;S4（原本为 3，S1 为 Leader，S4 是新加入的），此时 Leader 宕机了，假设 S2 先选举超时，他可以从自己、S3&#x2F;S4 获得 3 张投票成为 Leader。若现在客户端发送一条记录需要同步日志，则 S2 需要把日志条目复制到 S3&#x2F;S4 才能提交，S3 因为是老节点，日志没有落后太多所以不会出太大问题；但是 S4 是空日志&#x2F;日志大幅落后的新节点，其日志中根本没有领导者待追加条目对应的 “前一条目索引 + 任期” 记录（或记录不匹配），日志一致性检查未通过，因此会持续拒绝领导者的 AppendEntries RPC。直到 S2 让 S4 复制完历史日志条目，S4 才能接收最新的日志条目。<br>但如果 S4 缺失的日志非常多，达到一定的量之后，复制历史数据就成为了耗时操作，所以 S4 迟迟不能复制最新的日志条目，导致 S2、或者说整个集群无法提交这个新的日志条目，系统对外就不可用了。</p>
+<p>Raft 选择的方案是：<br>新节点以<strong>非投票节点</strong>的身份加入集群。领导者会向其复制日志条目，但在投票和日志提交的多数派计算中，该节点暂不被纳入统计。待新节点的日志追平集群其他节点后，配置变更即可按前述流程执行。<br>复制的过程中，领导者向新节点的日志条目复制过程分轮次进行。每一轮的操作，领导者在本轮开始时日志中存在的所有条目，全部复制至新节点的日志。若以新节点可能会接收好几次的日志同步，耗时会一次比一次少（因为这个过程是 Leader 上一次的未复制日志，属于增量复制）。当某一次新节点复制耗时小于一个选举超时时间，则领导者可将新节点正式加入集群。</p>
+<h2 id="干扰节点"><a href="#干扰节点" class="headerlink" title="干扰节点"></a>干扰节点</h2><p>以往的选举发生情况一般是原 Leader 宕机&#x2F;转交，但 Leader 权都不会被强行剥夺。<br>而如果无额外机制的情况下，在变更集群配置时可能会产生 Leader 权强行被非 Cnew 节点剥夺的情况，从而影响更改配置的流程。</p>
+<p><strong>无额外机制</strong>：无心跳防护、无配置过滤、节点处理 <code>RequestVote</code> 仅按<strong>原生规则</strong>，且<strong>配置仅在提交后生效</strong>。</p>
+<p><img src="/15c78de5d315/4_7.png" alt="图 4.7"></p>
+<p>当然这是一个比较极端的情况，如图：<br>Cold：S1&#x2F;S2&#x2F;S3&#x2F;S4（4 节点），移除 S1 后 Cnew：S2&#x2F;S3&#x2F;S4（3 节点）<br>S4 为原 Leader，<strong>已在自身日志生成 Cnew 条目，但尚未向 S2&#x2F;S3 复制该条目</strong>（最易干扰的临界状态，也是分布式场景中极常见的瞬间）；<br>因为 S1 不是 Cnew 成员，所以 S4 停止向 S1 发心跳与日志，而 S2&#x2F;S3 还是 Cnew 成员所以发送了心跳再发送了 Cnew 配置条目。S1 因心跳中断，触发选举超时自身 <code>任期 +1</code>，向 Cold 发送 <code>RequestVote</code>。与此同时，S2&#x2F;S3 并未复制到 Cnew 配置到日志条目，并且未选举超时。那么 S2&#x2F;S3 是会给 S1 投票的，当然 S4 也会因为自身任期比 S1 更小而退化为跟随者（先比较的是自身任期而不是最后一条日志条目的任期，不过这已经不重要，拥有 <code>S2/S3 + 自身</code> 的投票已经满足多数派阈值）。</p>
+<p>此时 S1 当选 Leader ，Cnew 配置条目完全无法同步到新集群节点，被永久丢失，集群中所有节点的日志均回到无 Cnew 的 Cold 状态。S1 作为 Leader，会以<strong>旧配置 Cold（S1&#x2F;S2&#x2F;S3&#x2F;S4）</strong> 管理集群，认定 S1 仍是合法节点，后续集群将持续以 4 节点旧配置运行，直到管理员（客户端）重新发起移除 S1 的配置变更操作。</p>
+<p>Raft 最终采用的解决方案是：<strong>通过心跳包判断集群是否存在有效的领导者</strong>。</p>
+<blockquote>
+<p>在 Raft 中，若领导者能持续向跟随者发送心跳包，则认为该领导者处于活跃状态（否则其他节点会发起选举）。因此，对于能正常接收领导者心跳包的集群，其他节点不应能对其造成干扰。我们通过修改 <code>RequestVote</code> RPC 实现这一逻辑：若节点在<strong>最小选举超时时间</strong>内收到过现任领导者的心跳包，当它再接收到 <code>RequestVote</code> 请求时，不会更新自身的任期号，也不会投出选票。该节点可直接丢弃请求、回复拒绝投票，或延迟处理请求，三种方式的实际效果基本一致。这一修改不会影响正常的选举流程 —— 因为正常情况下，每个节点都会等待至少一个最小选举超时时间后，才会发起选举。但它能有效避免未被纳入 Cnew 的节点造成的干扰：只要领导者能持续向其配置内的节点发送心跳包，就不会因其他节点的更大任期号而被废黜。</p>
+</blockquote>
+<p>简单来说就是通过心跳机制，跟随者在心跳有效期前收到任何的 <code>RequestVote</code> RPC 都将被拒绝；只有最小选举时间到期都没有收到心跳，才接受 <code>RequestVote</code> RPC 。</p>
+<p>该修改会与前文描述的领导者移交机制产生冲突 —— 在<strong>领导者移交</strong>过程中，节点可无需等待选举超时，合法发起选举。针对该场景，其他节点即使感知到集群存在现任领导者，也仍需处理该 <code>RequestVote</code> 请求。解决方案是：在这类 <code>RequestVote</code> 请求中添加一个<strong>特殊标记</strong>，用于标识该选举的合法性（即 “我获得了干扰领导者的许可 —— 是它让我发起的选举！”）。</p>
+<p>当然，<strong>心跳机制无法 100% 保证不被干扰</strong>，该心跳防护机制仅能<strong>大幅降低非新配置节点当选 Leader 的概率</strong>，但因分布式系统<strong>异步性（网络丢包、节点时钟漂移、RPC 延迟）</strong> 的底层不可控性，仍有较小的时间空档或 Leader 直接宕机等原因，不存在能 100% 杜绝该问题的单一机制。</p>
+<h1 id="日志压缩"><a href="#日志压缩" class="headerlink" title="日志压缩"></a>日志压缩</h1><p>Raft 节点是个<strong>键值对状态机</strong>，核心就是执行「增 &#x2F; 删 &#x2F; 改」的日志指令，日志是<strong>一条条操作记录</strong>，状态机执行日志时会实时合并操作，只留<strong>最终的键值结果</strong>；<br>也就是说状态机始终记录着此时键值的最终结果，其体积随业务有效数据和集群元数据缓慢变化；而日志会因为对任意键值对的任意操作持续膨胀，远快于状态机。<br>当日志足够大时，会产生一系列性能问题导致集群不可用，所以我们要对日志压缩。</p>
+<p>日志压缩前，必须先<strong>创建快照</strong>，快照是<strong>当前状态机的全量键值结果 + 日志锚点元数据</strong>序列化后存储，避免压缩时出现故障导致数据丢失。<br>然后执行日志压缩，可以安全地把快照锚点（lastIndex）之前的所有日志直接删除，大幅减少日志的体积。</p>
+<p>虽然状态机的存储结果本质是键值对，但是实际上工业级实现中（比如 LogCabin），为了适配实际业务需求，会把基础键值对扩展为 “树状分层的键值对结构”，采用<strong>多叉树</strong>作为核心数据结构，而非简单的扁平集合。但<strong>核心还是键值映射，只是键有了 “层级路径”，节点间有了 “父子依赖”</strong>，就像电脑中目录和文件的层级关系一样。为了保证应用快照时能完整、正确地重建整个树状状态机，不能仅备份叶子节点的键值对，必须保证父节点实体先存在。因此要遵循前序深度优先遍历的规则，先访问并记录当前父节点的创建信息，再依次深度遍历其所有子节点，记录内部子节点的创建信息和叶子子节点的完整键值对信息。</p>
+<h2 id="基于内存状态机的快照实现"><a href="#基于内存状态机的快照实现" class="headerlink" title="基于内存状态机的快照实现"></a>基于内存状态机的快照实现</h2><h3 id="并发快照"><a href="#并发快照" class="headerlink" title="并发快照"></a>并发快照</h3><p>并发快照过程中，若有新日志条目修改数据，如何保证快照数据的一致性（不被新修改干扰）？</p>
+<ol>
+<li>状态机可基于不可变（函数式）数据结构构建，以此支持并发快照。</li>
+<li>亦可借助操作系统提供的写时复制支持（前提是编程环境支持该特性）。</li>
+</ol>
+<h3 id="快照触发时机"><a href="#快照触发时机" class="headerlink" title="快照触发时机"></a>快照触发时机</h3><p>当日志文件大小超过上一次快照大小与可配置扩展系数的乘积时，触发新的快照。该扩展系数的取值本质是在磁盘带宽开销与存储利用率之间做权衡。</p>
+<h1 id="客户端交互"><a href="#客户端交互" class="headerlink" title="客户端交互"></a>客户端交互</h1><p>规则上说，主节点处理所有请求以保证强一致性，从节点核心为高可用与容灾，工程优化中可合规处理只读请求、分担主节点负载。</p>
+<h2 id="如何保证线性化一致性"><a href="#如何保证线性化一致性" class="headerlink" title="如何保证线性化一致性"></a>如何保证线性化一致性</h2><p>实现线性化语义：<br>说白了就是让客户端的所有命令具备幂等性。具体通过「客户端唯一标识 + 命令唯一序列号」的组合实现：为每个客户端分配全局唯一标识，客户端为自身发起的每条命令按递增规则分配唯一序列号（如 1、2、3……）。<br>状态机在执行并提交完某条日志条目后，会将该客户端的唯一标识、本次执行命令的序列号及对应执行结果，作为客户端会话数据持久化记录（<code>指令-结果</code> 的键值对集合）；若后续再次收到该客户端小于&#x2F;相同序列号的命令，状态机会直接返回已有执行结果，不再重新执行，以此保证命令仅执行一次，从底层实现线性化语义要求。<br>当然这个会话记录不会永久留存，否则会造成服务器资源无限占用，他只是一个类似缓存的东西，只不过是运行在分布式集群上。因此 Raft 在记录客户端会话数据的同时，带上<strong>提交时的时间戳</strong>（划重点，是集群共识后的统一时间戳），并基于该统一时间戳制定过期规则完成集群的同步淘汰（和 Redis 缓存太像了）。</p>
+<h2 id="高效只读查询"><a href="#高效只读查询" class="headerlink" title="高效只读查询"></a>高效只读查询</h2><p>客户端的<strong>只读命令</strong>仅对复制<strong>状态机</strong>进行查询，不会对其做出修改。因此<strong>绕开 Raft 日志处理只读查询</strong>的收益是非常可观的（如果不绕开日志，那么读取数据的请求也会被写成日志条目同步到多数派集群）。但是如果没有额外的机制，绕开日志会导致只读查询返回<strong>过期结果</strong>，且<strong>不满足线性一致性</strong>（因为没有获得多数派节点的确认 - 通过日志复制提交）。</p>
+<blockquote>
+<p>线性一致性要求，读操作的结果必须反映出该读操作发起后某个时刻的系统状态；每一次读操作，至少要返回最新已提交写操作的执行结果</p>
+</blockquote>
+<p>例如，某任领导者若与集群其他节点发生网络分区，集群剩余节点可能会选举出新的领导者，并向 Raft 日志提交新的条目。如果这个被分区的领导者在未与其他节点交互的情况下响应只读查询，返回的结果就是过期的，且不满足线性一致性。</p>
+<p>还有一种场景：“上一任领导提交了部分条目，当前领导虽持有，但未标记为自身任期的已提交”。<br>比如上任 Leader 复制日志到了多数派节点并让多数派节点提交了就宕机，导致现在有一个节点虽然已经复制到日志条目，但是因为 Leader 的宕机导致没有接到提交到状态机的指令，他是不知道这个条目是否被多数派节点提交的，也不敢贸然提交到状态机。他会向其他节点复制之前任期的日志条目，然后在自己任期产生的日志条目提交时顺带把之前的任期条目提交了——具体回顾《提交之前的任期条目》内容（这个节点虽然没有提交日志条目到状态机，但是选举获得投票不是看状态机的条目，而是看当前任期以及历史日志条目的 <code>lastindex</code> 大小长度）<br>但是这个时候，作为新的 Leader 如果长时间没有接到写操作的命令，那么之前任期的日志条目也是长时间不会被再次提交，导致 Leader 节点和少数节点状态机一直缺少这个日志条目的结果。此时如果客户端发送只读命令，那么在不同节点获取到的数据是不一样的（Raft 的设计允许让跟随者返回只读查询的结果，所以同一个请求可以由不同的节点响应，但是这个并未在 LogCabin 实现），比如现在的 Leader 的状态机就没有上任期提交的日志条目结果，产生数据不一致的结果。</p>
+<p>所以当新 Leader 任期时，立马提交一条<strong>空操作（no-op）条目</strong>的机制很有用。但仅让 Leader 拥有了自身任期确认的、集群全局最新的 commitIndex。</p>
+<p>对于绕开日志的只读查询而言这是不够的，还存在三个问题：</p>
+<ol>
+<li>no-op 完成后，<code>commitIndex</code> 依然是<strong>动态变化</strong>的，无法直接作为查询基准</li>
+<li>no-op 无法验证 Leader 的<strong>实时领导权</strong>，可能出现「Leader 已失效但自身不知情」（场景一）</li>
+<li>no-op 仅保证<strong>日志提交层面</strong>的 commitIndex 更新，不保证<strong>状态机应用层面</strong>的同步落地</li>
+</ol>
+<blockquote>
+<p>关于第 1、3 个问题可能有点疑问：<br>领导者将当前的 commitIndex 保存至本地变量 readIndex 有啥用？提交 no-op 空条目后 commitIndex 不是等于 readIndex？都提交到状态机了吧，为啥有“待自身的状态机推进至至少与 readIndex 对应的位置”这种说法？</p>
+<p>关于提交日志条目到状态机，就像交给一个消息队列一样，队列里面的日志条目最终会应用到状态机，但不是立即应用，状态机的实际运行进度，只由另一个独立指标决定 —— 最后应用索引（Last Applied Index）。<br>所以一个只读查询到达时，状态机里面会存在这样一段时间窗口：日志条目已经复制到多数派集群并且完成提交（commitIndex 更新），但是这个提交的日志条目可能还没有在状态机应用（Last Applied Index &lt; commitIndex），如果直接返回结果的话会导致客户端接收到 Raft 集群已提交的消息却查不到对应数据；但如果无限制延迟查询的话，若此时集群又接收到新的写操作日志条目并提交，会导致 commitIndex 不断增大，若以动态的 commitIndex 为基准等待，执行查询时获取到的并不是查询发起时的状态结果，而可能是被新的日志条目覆盖后的结果。<br>因此不能立即执行查询返回结果，也不能没有限制地延后执行查询。</p>
+</blockquote>
+<p>对于上述问题：<br>Raft 的方案是处理客户端只读查询请求时，Leader 接收请求后，不会立即执行查询，而是先暂存该请求（<strong>新 Leader 则需要先完成本任期 no-op 空条目提交</strong>，以确保 commitIndex 为集群全局可靠值）；<br>在处理该请求的这一刻，给每个只读查询分配一个局部变量 readIndex，记录当前的 readIndex &#x3D; commitIndex（冻结固定的状态基准，让等待有明确终止条件），随后先<strong>通过心跳包确认 Leader 仍为合法主节点</strong>，保证 <code>readIndex</code> 对应的日志已在集群共识提交；返回状态允许包含后续已应用日志。<br>再<strong>等待 Last Applied Index 达到 readIndex</strong>；当 Last Applied Index 达到 readIndex 后，通过读写锁互斥让应用日志的线程短暂阻塞，原子性执行查询并拿到结果（可同步 &#x2F; 异步返回给客户端），锁释放后应用线程立刻继续异步应用后续的日志条目。<br>期间集群运行不受任何影响，系统依旧可以接受新的日志条目并完成提交，让 commitIndex 持续增大。</p>
+<p><strong>跟随者也可协助分担只读查询的处理工作</strong>。这不仅能提升系统的读吞吐量，还能将负载从领导者转移，让领导者可以处理更多的读写请求。但若无额外防护措施，这些由跟随者处理的读操作，同样存在返回过期数据的风险。例如，与集群发生分区的跟随者，可能长时间无法从领导者处接收新的日志条目；即便跟随者收到了领导者的心跳，该领导者也可能已被取代，只是自身尚未知晓。要安全处理读请求，跟随者可向领导者发起请求，仅获取当前的 readIndex（领导者会执行完备性检验，即提交 no-op；记录 readIndex；发送心跳向集群确认自己领导者身份）；随后，跟随者可针对自身的状态机等待 Last Applied Index 同步至 readIndex 然后获取结果，处理所有已累积的只读查询。（LogCabin 未实现该方案）</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/15c78de5d315/">http://ecamt35.github.io/15c78de5d315/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">分布式系统</a><a class="post-meta__tags" href="/tags/Raft/">Raft</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/6d8e2f58e408/" title="Arch+River 使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Arch+River 使用</div></div><div class="info-2"><div class="info-item-1">自用系统配置</div></div></div></a><a class="pagination-related" href="/9a0e6259ac11/" title="浅读Raft算法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">浅读Raft算法</div></div><div class="info-2"><div class="info-item-1">截取融合USENIX ATC'14版本与作者博士论文版本的奇美拉，前部分主要以USENIX ATC'14为主+个人修改，后部分以作者博士论文版本的机翻为主。章节引用、图片序号没更正，看上去也许比较乱...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/9a0e6259ac11/" title="浅读Raft算法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-02</div><div class="info-item-2">浅读Raft算法</div></div><div class="info-2"><div class="info-item-1">截取融合USENIX ATC'14版本与作者博士论文版本的奇美拉，前部分主要以USENIX ATC'14为主+个人修改，后部分以作者博士论文版本的机翻为主。章节引用、图片序号没更正，看上去也许比较乱...</div></div></div></a><a class="pagination-related" href="/fa2bcf65db26/" title="CAP与分布式系统"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-08</div><div class="info-item-2">CAP与分布式系统</div></div><div class="info-2"><div class="info-item-1">CAP理论与理解</div></div></div></a><a class="pagination-related" href="/3d36dd04b30a/" title="分布式下的WebSocket"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-31</div><div class="info-item-2">分布式下的WebSocket</div></div><div class="info-2"><div class="info-item-1">分布式下的WebSocket问题</div></div></div></a><a class="pagination-related" href="/d451d62f56e3/" title="分布式IM设计的胡思乱想"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-05</div><div class="info-item-2">分布式IM设计的胡思乱想</div></div><div class="info-2"><div class="info-item-1">关于IM设计的一些思考</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Raft-%E7%89%B9%E6%80%A7%E6%80%BB%E7%BB%93"><span class="toc-number">1.</span> <span class="toc-text">Raft 特性总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Raft-%E5%9F%BA%E7%A1%80"><span class="toc-number">2.</span> <span class="toc-text">Raft 基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E7%8A%B6%E6%80%81%E6%9C%BA"><span class="toc-number">2.1.</span> <span class="toc-text">复制状态机</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%9C%E5%8D%A0%E5%BA%AD%E5%B0%86%E5%86%9B%E9%97%AE%E9%A2%98"><span class="toc-number">2.2.</span> <span class="toc-text">拜占庭将军问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E5%8F%AF%E7%94%A8%E8%80%8C%E4%B8%8D%E6%98%AF%E5%AE%8C%E5%85%A8%E5%8F%AF%E7%94%A8"><span class="toc-number">2.3.</span> <span class="toc-text">高可用而不是完全可用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CAP-%E7%90%86%E8%AE%BA%EF%BC%9ACP"><span class="toc-number">2.4.</span> <span class="toc-text">CAP 理论：CP</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Raft-%E7%AE%97%E6%B3%95%E6%A0%B8%E5%BF%83"><span class="toc-number">3.</span> <span class="toc-text">Raft 算法核心</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E5%85%A8%E6%80%A7"><span class="toc-number">3.1.</span> <span class="toc-text">安全性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E4%BA%A4%E4%B9%8B%E5%89%8D%E4%BB%BB%E6%9C%9F%E5%86%85%E7%9A%84%E6%97%A5%E5%BF%97%E6%9D%A1%E7%9B%AE"><span class="toc-number">3.1.1.</span> <span class="toc-text">提交之前任期内的日志条目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%AF%E7%94%A8%E6%80%A7%E4%B8%8E%E6%97%B6%E9%97%B4%E4%BE%9D%E8%B5%96"><span class="toc-number">3.1.2.</span> <span class="toc-text">可用性与时间依赖</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E6%88%90%E5%91%98%E5%8F%98%E5%8C%96"><span class="toc-number">4.</span> <span class="toc-text">集群成员变化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E5%8F%98%E6%9B%B4%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-number">4.1.</span> <span class="toc-text">自动配置变更的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E4%B8%8D%E4%B8%80%E8%87%B4%E5%BD%A2%E6%88%90%E5%A4%9A%E4%B8%AA%E7%8B%AC%E7%AB%8B%E5%AD%90%E9%9B%86%E7%BE%A4"><span class="toc-number">4.2.</span> <span class="toc-text">配置不一致形成多个独立子集群</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E8%8A%82%E7%82%B9%E6%97%A5%E5%BF%97%E8%BF%BD%E5%B9%B3"><span class="toc-number">4.3.</span> <span class="toc-text">新节点日志追平</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B2%E6%89%B0%E8%8A%82%E7%82%B9"><span class="toc-number">4.4.</span> <span class="toc-text">干扰节点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E5%8E%8B%E7%BC%A9"><span class="toc-number">5.</span> <span class="toc-text">日志压缩</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E5%86%85%E5%AD%98%E7%8A%B6%E6%80%81%E6%9C%BA%E7%9A%84%E5%BF%AB%E7%85%A7%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.1.</span> <span class="toc-text">基于内存状态机的快照实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E5%BF%AB%E7%85%A7"><span class="toc-number">5.1.1.</span> <span class="toc-text">并发快照</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%AB%E7%85%A7%E8%A7%A6%E5%8F%91%E6%97%B6%E6%9C%BA"><span class="toc-number">5.1.2.</span> <span class="toc-text">快照触发时机</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BA%A4%E4%BA%92"><span class="toc-number">6.</span> <span class="toc-text">客户端交互</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E7%BA%BF%E6%80%A7%E5%8C%96%E4%B8%80%E8%87%B4%E6%80%A7"><span class="toc-number">6.1.</span> <span class="toc-text">如何保证线性化一致性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AB%98%E6%95%88%E5%8F%AA%E8%AF%BB%E6%9F%A5%E8%AF%A2"><span class="toc-number">6.2.</span> <span class="toc-text">高效只读查询</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术">Linux虚拟网络化与隔离技术</a><time datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/15c78de5d315/" title="Raft阅读随记">Raft阅读随记</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9a0e6259ac11/" title="浅读Raft算法">浅读Raft算法</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/6d8e2f58e408/" title="Arch+River 使用">Arch+River 使用</a><time datetime="2026-01-01T10:30:00.000Z" title="发表于 2026-01-01 18:30:00">2026-01-01</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

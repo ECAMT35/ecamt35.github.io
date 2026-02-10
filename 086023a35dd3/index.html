@@ -1,0 +1,288 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Linux虚拟网络化与隔离技术 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Linux虚拟网络化与隔离技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux虚拟网络化与隔离技术">
+<meta property="og:url" content="http://ecamt35.github.io/086023a35dd3/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="Linux虚拟网络化与隔离技术">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2026-02-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-10T09:33:55.135Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Linux虚拟网络化与隔离技术",
+  "url": "http://ecamt35.github.io/086023a35dd3/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2026-02-07T16:00:00.000Z",
+  "dateModified": "2026-02-10T09:33:55.135Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/086023a35dd3/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Linux虚拟网络化与隔离技术',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">Linux虚拟网络化与隔离技术</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Linux虚拟网络化与隔离技术</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-10T09:33:55.135Z" title="更新于 2026-02-10 17:33:55">2026-02-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GNU-Linux/">GNU/Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-02-10 17:33:55&quot;}" hidden></div><p>参考：<br><a target="_blank" rel="noopener" href="https://wiki.archlinux.org/title/Network_bridge">https://wiki.archlinux.org/title/Network_bridge</a><br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/549456494">https://zhuanlan.zhihu.com/p/549456494</a></p>
+<p>Linux 的虚拟网络无需额外硬件，仅通过内核软件配置即可实现隔离、虚拟化等功能，是容器化、虚拟机部署的核心基础。<br>虚拟以太网（veth）、网桥（bridge）、macvlan 是最基础常用的三类技术，基于 Namespace、CGroup 和虚拟网络设备驱动实现，核心是在单物理主机上构建独立、可互通的网络环境，适配容器、虚拟机的网络需求。</p>
+<h1 id="虚拟以太网-veth"><a href="#虚拟以太网-veth" class="headerlink" title="虚拟以太网 - veth"></a>虚拟以太网 - veth</h1><p>veth 是 Linux 内核提供的<strong>点对点虚拟网络设备</strong>，核心作用是打通两个独立的网络命名空间（Network Namespace）——网络命名空间是 Linux 实现网络隔离的基础，每个命名空间拥有独立的网卡、IP、路由表，相当于一个“独立的小网络”，而 veth 就是连接这些“小网络”的唯一链路。</p>
+<p>veth 必须成对存在（称为 veth pair），无法单独使用，就像一根两端都有接头的网线，一端插入一个网络命名空间，另一端插入另一个网络命名空间，仅允许这两个命名空间通过该链路通信，与外部网络完全隔离。</p>
+<p>当创建一对 veth 设备（如 veth0 和 veth1）时，内核会为两者建立双向数据通道：</p>
+<ul>
+<li>veth0 分配给主机命名空间，veth1 分配给容器命名空间；</li>
+<li>容器数据包经 veth1 传至 veth0，由主机协议栈（如 NAT）处理后实现联网；</li>
+<li>主机数据包经 veth0 传至 veth1，进入容器命名空间。</li>
+</ul>
+<p>注：veth 本身不具备路由、NAT、桥接能力，仅负责数据转发，容器要访问外网，必须依赖主机的网络协议栈做额外处理。</p>
+<h1 id="网桥-bridge"><a href="#网桥-bridge" class="headerlink" title="网桥 - bridge"></a>网桥 - bridge</h1><p>网桥（又称虚拟网桥）是 Linux 内核提供的<strong>二层网络交换设备</strong>，本质是一个软件版的交换机。它的核心作用是将多个物理网卡、虚拟网卡（如 veth）桥接到同一个广播域，让所有连接到网桥上的设备，共享同一网络链路，相当于所有设备都插在同一个物理交换机上，可直接互通，无需经过路由转发。</p>
+<p>与 veth 的点对点通信不同，网桥支持一对多通信，能够连接多个网络命名空间、物理设备，是构建多设备虚拟局域网（LAN）的核心技术。</p>
+<p>网桥的工作机制与物理交换机类似，核心是 MAC 地址学习和数据包转发：</p>
+<ul>
+<li>当网桥启动后，会监听所有连接到它的网卡（物理网卡、veth 等）的数据包，记录每个网卡对应的设备 MAC 地址，形成一张 MAC 地址表；</li>
+<li>当收到数据包时，网桥会查看数据包的目标 MAC 地址，根据 MAC 地址表，将数据包转发到对应的网卡（仅转发到目标设备，不广播到所有设备）；</li>
+<li>若网桥未在 MAC 地址表中找到目标 MAC 地址，则会将数据包广播到所有连接的网卡，直到目标设备响应，再更新 MAC 地址表。</li>
+</ul>
+<p>在容器场景中，通常会将主机的物理网卡（如 wlan0、eth0）桥接到网桥上，再将容器的 veth 网卡也连接到网桥上——这样，容器、主机、局域网其他设备就处于同一个广播域，可直接互通，容器无需依赖主机 NAT 转发就能访问外网。</p>
+<p>使用参考文档：<br><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000009491002#item-4">https://segmentfault.com/a/1190000009491002#item-4</a></p>
+<h1 id="macvlan"><a href="#macvlan" class="headerlink" title="macvlan"></a>macvlan</h1><p>macvlan 是 Linux 内核提供的<strong>物理网卡虚拟化技术</strong>，核心作用是在单块物理网卡上，生成多个独立的虚拟网卡（称为 macvlan 子接口），每个子接口拥有独立的 MAC 地址——相当于给物理网卡分身，每个分身都能独立工作，直接共享物理网卡的网络链路，无需经过网桥、veth 等中间层。</p>
+<p>与 veth、网桥不同，macvlan 无需依赖其他虚拟设备，直接让容器挂靠在物理网卡上，成为局域网内的独立设备，在路由器看来，容器与主机是平级的两个设备，均能通过 DHCP 获取局域网 IP。</p>
+<p>macvlan 的工作原理非常简单，本质是 MAC 地址隔离与转发：</p>
+<ul>
+<li>在物理网卡（如 wlan0）上创建多个 macvlan 子接口（如 mv-wlan0、mv-wlan1），每个子接口分配独立的 MAC 地址；</li>
+<li>将每个子接口分配给一个容器，容器将该子接口作为自身的默认网卡；</li>
+<li>容器发送的数据包，会携带自身子接口的 MAC 地址，通过物理网卡直接发送到路由器，路由器根据 MAC 地址和 IP 地址，将数据包转发到目标设备；</li>
+<li>外部设备发送给容器的数据包，路由器会根据容器的 MAC 地址，通过物理网卡转发到对应的 macvlan 子接口，再传递到容器内部。</li>
+</ul>
+<p>macvlan 支持多种模式（如 bridge、private、vepa 等），其中最常用的是 bridge 模式，允许同一物理网卡上的多个 macvlan 子接口之间互相通信，同时也能与局域网其他设备互通。</p>
+<p>macvlan 适合容器需要独立局域网 IP、配置简单、高速互通的场景，<strong>是单机容器需获得局域网独立 IP 场景的最轻量高效方案</strong></p>
+<p>关于 macvlan 的 bridge 模式与传统 Linux 网桥（bridge）：</p>
+<ul>
+<li>macvlan 的 <code>bridge</code>：是 macvlan 网卡虚拟化的一种工作模式，作用是让同一物理网卡上的多个 macvlan 子接口之间、子接口与局域网其他设备之间能互通，无任何虚拟交换机组件；</li>
+<li>传统网桥（bridge）：本身就是虚拟二层交换机，「bridge」是其技术本质，所有桥接设备的流量都需经该虚拟交换机转发、寻址。</li>
+</ul>
+<p>所以 macvlan 的 bridge 模式更加节省 CPU、内存，同时网络延迟更低，吞吐率更高。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>虚拟以太网（veth）</th>
+<th>网桥（bridge）</th>
+<th>macvlan</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>技术本质</td>
+<td>点对点虚拟链路，命名空间通信工具</td>
+<td>虚拟二层交换机，多设备桥接组网</td>
+<td>物理网卡虚拟化，单网卡分身扩容</td>
+</tr>
+<tr>
+<td>网络隔离性</td>
+<td>强隔离：仅两命名空间互通</td>
+<td>弱隔离：同广播域，无隔离</td>
+<td>中等隔离：容器独立，局域网互通</td>
+</tr>
+<tr>
+<td>IP 网段</td>
+<td>主机私有网段，与局域网无关</td>
+<td>局域网网段，与主机同段</td>
+<td>局域网网段，与主机同段</td>
+</tr>
+<tr>
+<td>互通性</td>
+<td>仅主机↔容器互通</td>
+<td>全互通（主机、容器、局域网）</td>
+<td>容器↔局域网互通，主机↔容器需经路由器回环</td>
+</tr>
+<tr>
+<td>上网方式</td>
+<td>依赖主机 NAT+iptables</td>
+<td>直连路由器，无需 NAT</td>
+<td>直连路由器，无需 NAT</td>
+</tr>
+<tr>
+<td>配置复杂度</td>
+<td>低，默认自动创建</td>
+<td>高，需手动创建桥接</td>
+<td>极低，仅指定物理网卡</td>
+</tr>
+<tr>
+<td>MAC 地址</td>
+<td>容器端有独立 MAC（宿主机内可见），对外部网络可见性取决于是否桥接&#x2F;NAT</td>
+<td>无独立 MAC，复用 veth</td>
+<td>有独立 MAC，子接口唯一</td>
+</tr>
+<tr>
+<td>使用场景</td>
+<td>容器仅需与主机通信</td>
+<td>多设备组网，需全互通</td>
+<td>容器需局域网 IP，配置简单</td>
+</tr>
+</tbody></table>
+<h1 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h1><p>除三类基础技术外，以下 4 种进阶方案适配复杂场景：</p>
+<h2 id="ipvlan"><a href="#ipvlan" class="headerlink" title="ipvlan"></a>ipvlan</h2><p>ipvlan 与 macvlan 同属物理网卡虚拟化技术，工作原理几乎一致，核心区别是：<strong>ipvlan 的所有子接口共享物理网卡的 MAC 地址，仅 IP 地址不同</strong>，而 macvlan 的每个子接口有独立的 MAC 地址。</p>
+<p>适配场景：路由器限制 MAC 地址数量（如部分企业路由器仅允许单个 MAC 地址接入），此时使用 ipvlan，所有容器共享主机 MAC 地址，可正常获取局域网 IP；<br>不适用于需要独立 MAC 地址的场景（如路由器基于 MAC 地址分配固定 IP）。</p>
+<h2 id="macvtap"><a href="#macvtap" class="headerlink" title="macvtap"></a>macvtap</h2><p>macvtap 是 macvlan 的衍生技术，专门为虚拟机（如 KVM、QEMU）设计，本质是将 macvlan 与 tap 设备（虚拟机与主机的网络接口）结合，实现虚拟机与物理网卡的直接连接。</p>
+<p>与 macvlan 相比，macvtap 支持更多的虚拟化场景，能够更好地适配虚拟机的网络 IO，降低延迟，同时保留了 macvlan“直连局域网、配置简单”的优势。</p>
+<p>适配场景：虚拟机需要直连局域网，获取独立 IP，追求高速网络 IO；<br>不适合容器场景（容器用 macvlan 更简洁）。</p>
+<h2 id="Open-vSwitch"><a href="#Open-vSwitch" class="headerlink" title="Open vSwitch"></a>Open vSwitch</h2><p>Open vSwitch（简称 OVS）是一款开源的高级虚拟交换机，功能远超 Linux 原生网桥，支持 VLAN、VXLAN、GRE 等多种网络协议，能够实现跨主机组网、流量控制、端口镜像、网络隔离等高级功能。</p>
+<p>与原生网桥相比，OVS 的优势在于可管理性和扩展性，支持通过命令行、API、Web 界面管理，能够适配大规模容器&#x2F;虚拟机集群（如跨主机的容器集群），是企业级部署的首选方案。</p>
+<p>适配场景：多主机容器集群（如 K8s 集群）、企业级虚拟机部署，需要高级网络管理（如流量监控、访问控制）；<br>不适用于简单场景，配置复杂。</p>
+<h2 id="VXLAN"><a href="#VXLAN" class="headerlink" title="VXLAN"></a>VXLAN</h2><p>VXLAN（虚拟可扩展局域网）是一种隧道技术，核心作用是突破物理网络限制，实现跨主机的虚拟网络互通——当容器部署在多台物理主机上时，VXLAN 可以在物理网络之上，构建一个虚拟的二层网络，让不同主机上的容器，仿佛处于同一个局域网，可直接互通。</p>
+<p>VXLAN 通常与 OVS、Docker Swarm、K8s 等工具结合使用，解决跨主机容器通信的问题，是云原生场景下的核心网络技术。</p>
+<p>适配场景：多主机容器集群、跨机房部署，需要容器之间跨主机直接通信；<br>不适用于单主机场景（无需隧道转发，徒增延迟）。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/086023a35dd3/">http://ecamt35.github.io/086023a35dd3/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/9a0e6259ac11/" title="浅读Raft算法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">浅读Raft算法</div></div><div class="info-2"><div class="info-item-1">截取融合USENIX ATC'14版本与作者博士论文版本的奇美拉，前部分主要以USENIX ATC'14为主+个人修改，后部分以作者博士论文版本的机翻为主。章节引用、图片序号没更正，看上去也许比较乱...</div></div></div></a><a class="pagination-related" href="/f6b1ecf8ea6e/" title="Java虚拟线程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Java虚拟线程</div></div><div class="info-2"><div class="info-item-1">Java虚拟线程</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%99%9A%E6%8B%9F%E4%BB%A5%E5%A4%AA%E7%BD%91-veth"><span class="toc-number">1.</span> <span class="toc-text">虚拟以太网 - veth</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BD%91%E6%A1%A5-bridge"><span class="toc-number">2.</span> <span class="toc-text">网桥 - bridge</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#macvlan"><span class="toc-number">3.</span> <span class="toc-text">macvlan</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%89%A9%E5%B1%95"><span class="toc-number">5.</span> <span class="toc-text">扩展</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#ipvlan"><span class="toc-number">5.1.</span> <span class="toc-text">ipvlan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#macvtap"><span class="toc-number">5.2.</span> <span class="toc-text">macvtap</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Open-vSwitch"><span class="toc-number">5.3.</span> <span class="toc-text">Open vSwitch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VXLAN"><span class="toc-number">5.4.</span> <span class="toc-text">VXLAN</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术">Linux虚拟网络化与隔离技术</a><time datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/15c78de5d315/" title="Raft阅读随记">Raft阅读随记</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9a0e6259ac11/" title="浅读Raft算法">浅读Raft算法</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/6d8e2f58e408/" title="Arch+River 使用">Arch+River 使用</a><time datetime="2026-01-01T10:30:00.000Z" title="发表于 2026-01-01 18:30:00">2026-01-01</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

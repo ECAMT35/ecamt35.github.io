@@ -1,0 +1,415 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Arch日常维护手册 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Archlinux日常维护命令速查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Arch日常维护手册">
+<meta property="og:url" content="http://ecamt35.github.io/0b5e5b638425/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="Archlinux日常维护命令速查">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2024-03-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-10T09:33:55.132Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="Archlinux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Arch日常维护手册",
+  "url": "http://ecamt35.github.io/0b5e5b638425/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2024-03-11T16:00:00.000Z",
+  "dateModified": "2026-02-10T09:33:55.132Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/0b5e5b638425/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Arch日常维护手册',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">Arch日常维护手册</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Arch日常维护手册</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-03-11T16:00:00.000Z" title="发表于 2024-03-12 00:00:00">2024-03-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-10T09:33:55.132Z" title="更新于 2026-02-10 17:33:55">2026-02-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GNU-Linux/">GNU/Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>12分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-02-10 17:33:55&quot;}" hidden></div><h1 id="包管理"><a href="#包管理" class="headerlink" title="包管理"></a>包管理</h1><h2 id="pacman"><a href="#pacman" class="headerlink" title="pacman"></a>pacman</h2><h3 id="升级"><a href="#升级" class="headerlink" title="升级"></a>升级</h3><p>升级系统及所有已经安装的软件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -Syu</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>直接安装某一个包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S &lt;packageName&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装原因"><a href="#安装原因" class="headerlink" title="安装原因"></a>安装原因</h3><p>pacman 数据库将软件包按照安装的原因分为两类：</p>
+<ul>
+<li><strong>显式安装</strong>：那些真正地被传递给通用 pacman <code>-S</code>和<code>-U</code>命令的包；</li>
+<li><strong>依赖</strong>：那些虽然（一般）从未被传递给 pacman 安装命令，但由于被其它显式安装的包<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wzh/index.php?title=Dependency&action=edit&redlink=1" title="Dependency（页面不存在）">需要</a>从而被隐式安装的包</li>
+</ul>
+<p>当安装软件包时，可以把安装原因强制设为<strong>依赖</strong>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S --asdeps &lt;package_name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>该命令使用的原因通常是显式安装的包可能会提供<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/PKGBUILD#optdepends" title="PKGBUILD">可选安装包</a>，这些包提供了非必须功能，可供用户自由选择。</p>
+<blockquote>
+<p>提示：用<code>--asdeps</code>安装可选依赖将确保如果你<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Pacman/%E6%8F%90%E7%A4%BA%E5%92%8C%E6%8A%80%E5%B7%A7#%E5%88%A0%E9%99%A4%E6%9C%AA%E4%BD%BF%E7%94%A8%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%8C%85%EF%BC%88%E5%AD%A4%E7%AB%8B%E8%BD%AF%E4%BB%B6%E5%8C%85%EF%BC%89" title="Pacman&#x2F;提示和技巧">移除孤立包</a>，pacman 将会一同移除按照上述方法指定安装的可选依赖。</p>
+</blockquote>
+<p>但是重新安装该软件包，当前安装原因默认会被保留。</p>
+<p>显式安装的软件包列表可用<code>pacman -Qe</code>获取, 设置为依赖的软件包可用<code>pacman -Qd</code>获取。</p>
+<p>改变某个已安装软件包的安装原因，可以执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -D --asdeps &lt;package_name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>反过来的对应参数<code>--asexplicit</code></p>
+<p><strong>注意：</strong> 在升级时使用<code>--asdeps</code>和<code>--asexplicit</code>选项，例如<code>pacman -Syu &lt;package_name&gt; --asdeps</code>，是不被推荐的。这会导致不仅改变要被安装的软件包的安装原因，也会改变被升级的软件包的安装原因。</p>
+<blockquote>
+<p>根据2021.05-1之后的行为变化，即使指定了 <code>--asdeps</code> 参数，<code>&lt;package_name&gt;</code> 本身仍然会被视为显式安装的包。只能显示安装后在通过 <code>pacman -D --asdeps &lt;package_name&gt;</code> 变为以依赖安装</p>
+</blockquote>
+<h3 id="搜索"><a href="#搜索" class="headerlink" title="搜索"></a>搜索</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">pacman -Ss &lt;packageName&gt; <span class="comment"># 在仓库中搜索含关键字的软件包（本地已安装的会标记）</span></span><br><span class="line"></span><br><span class="line">pacman -Qs &lt;packageName&gt; <span class="comment"># 搜索已安装的软件包</span></span><br><span class="line"></span><br><span class="line">pacman -Qu <span class="comment"># 列出所有可升级的软件包</span></span><br><span class="line"></span><br><span class="line">pacman -Qt <span class="comment"># 列出不被任何软件要求的软件包</span></span><br><span class="line"></span><br><span class="line">pacman -Q &lt;packageName&gt; <span class="comment"># 查看软件包是否已安装，已安装则显示软件包名称和版本</span></span><br><span class="line"></span><br><span class="line">pacman -Qi &lt;packageName&gt; <span class="comment"># 查看某个软件包信息，显示较为详细的信息，包括描述、构架、依赖、大小等等</span></span><br><span class="line"></span><br><span class="line">pacman -Ql &lt;packageName&gt; <span class="comment"># 列出软件包内所有文件，包括软件安装的每个文件、文件夹的名称和路径</span></span><br><span class="line"></span><br><span class="line">pacman -Qo /path/to/a/file <span class="comment"># 可以通过查询数据库获知目前你的文件系统中某个文件是属于哪个软件包</span></span><br><span class="line"></span><br><span class="line">pacman -Qdt <span class="comment"># 罗列所有不再作为依赖的软件包（孤立 orphans)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="清理"><a href="#清理" class="headerlink" title="清理"></a>清理</h3><p>删除孤立软件包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -Rns $(pacman -Qtdq)</span><br></pre></td></tr></table></figure>
+
+<p>删除当前未安装的所有缓存包和未使用的同步数据库</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -Sc</span><br></pre></td></tr></table></figure>
+
+<p>从缓存中删除所有文件，这是最激进的方法，不会在缓存文件夹中留下任何内容</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -Scc</span><br></pre></td></tr></table></figure>
+
+<h3 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h3><p>删除指定软件包，及其所有没有被其他已安装软件包使用的依赖关系：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pacman -Rns &lt;packageName&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># -R 删除单个软件包，会保留其全部已经安装的依赖关系</span></span><br><span class="line"><span class="comment"># -n pacman 删除某些程序时会备份重要配置文件，在其后面加上*.pacsave扩展名。-n 选项可以避免备份这些文件</span></span><br><span class="line"><span class="comment"># -s 删除其所有没有被其他已安装软件包使用的依赖关系</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他用法"><a href="#其他用法" class="headerlink" title="其他用法"></a>其他用法</h3><p>在不同的 <code>-大写字母</code>，可跟着不同的小写字母实现更多不同的功能，具体可用指南查看</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pacman -h <span class="comment"># 查看指南</span></span><br><span class="line"></span><br><span class="line">pacman &#123;-R --remove&#125; <span class="comment"># 查看 -R 的可选参数</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="yay"><a href="#yay" class="headerlink" title="yay"></a>yay</h2><h3 id="升级-1"><a href="#升级-1" class="headerlink" title="升级"></a>升级</h3><p>升级系统，相当于yay -Syu</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay</span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-1"><a href="#安装-1" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay -S &lt;packageName&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="搜索-1"><a href="#搜索-1" class="headerlink" title="搜索"></a>搜索</h3><p>查看仅通过yay安装的包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay -Qm</span><br></pre></td></tr></table></figure>
+
+<h3 id="卸载-1"><a href="#卸载-1" class="headerlink" title="卸载"></a>卸载</h3><p>要删除包及其依赖项</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay -Rns &lt;packageName&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="清理-1"><a href="#清理-1" class="headerlink" title="清理"></a>清理</h3><p>清理 yay 缓存</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">rm</span> -rf ~/.cache/yay</span><br></pre></td></tr></table></figure>
+
+<p>清理孤立的包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yay -Yc</span><br><span class="line"></span><br><span class="line"><span class="comment"># -Y：表示同时清理未使用的依赖项。</span></span><br><span class="line"><span class="comment"># -c：表示清理缓存，即删除已下载的软件包文件。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他用法-1"><a href="#其他用法-1" class="headerlink" title="其他用法"></a>其他用法</h3><p>打印系统统计信息，显示已安装软件包和系统健康状况的统计数据</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay -Ps</span><br></pre></td></tr></table></figure>
+
+<h2 id="pacnew处理"><a href="#pacnew处理" class="headerlink" title="pacnew处理"></a>pacnew处理</h2><p>处理过程基本一致，请看<code>mkinitcpio.conf变动</code>章节</p>
+<h2 id="mkinitcpio-conf变动"><a href="#mkinitcpio-conf变动" class="headerlink" title="mkinitcpio.conf变动"></a>mkinitcpio.conf变动</h2><p>在Arch Linux系统中，<code>mkinitcpio.conf</code> 是一个非常重要的配置文件，它用于定义在初始化ramdisk（initrd或initramfs）创建过程中包含哪些模块和文件。<br>这个配置对系统启动至关重要。当系统更新并且这个更新影响到 <code>mkinitcpio</code> 时，可能会生成一个新的配置文件示例，名为 <code>mkinitcpio.conf.pacnew</code> 。</p>
+<p>处理 <code>mkinitcpio.conf</code> 和 <code>mkinitcpio.conf.pacnew</code> 文件步骤如下：</p>
+<ol>
+<li>首先，你需要检查 <code>.pacnew</code> 文件与现有的 <code>mkinitcpio.conf</code> 文件之间的差异。可以使用 <code>nvim -d</code> （Diff mode）来完成这一任务。如：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nvim -d /etc/mkinitcpio.conf /etc/mkinitcpio.conf.pacnew</span><br><span class="line"><span class="comment"># 这将显示两个文件之间的差异。vimdiff 的使用看 vim 篇</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在做任何更改之前，建议备份原始的 <code>mkinitcpio.conf</code> 文件。这样，如果新的配置导致问题，你可以轻松地回滚到之前的配置。如：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> /etc/mkinitcpio.conf /etc/mkinitcpio.conf.bak</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>把 <code>mkinitcpio.conf.pavnew</code> 的新增参数内容复制到 <code>mkinitcpio.conf</code> ，对于不同的参数的值，请谨慎更改或保留。（建议使用 vim&#x2F;neovim 的 <a target="_blank" rel="noopener" href="https://neovim.io/doc/user/diff.html#_1.-starting-diff-mode">diff 模式</a> 完成）</p>
+</li>
+<li><p>一旦你合并了并保存了 <code>mkinitcpio.conf</code> 文件，你需要重新生成 initramfs 使更改生效：</p>
+</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkinitcpio -P</span><br><span class="line"><span class="comment"># 为所有已安装的内核生成新的initramfs。</span></span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>更改生效后，重启你的系统以确保一切正常工作。没啥问题就可以删除<code>.pacnew</code>文件和备份文件了</li>
+</ol>
+<h3 id="mkinitcpio-P"><a href="#mkinitcpio-P" class="headerlink" title="mkinitcpio -P"></a>mkinitcpio -P</h3><p>命令<code>mkinitcpio -P</code>在Arch Linux及其衍生系统中用于重新生成所有已安装内核的初始RAM磁盘（initramfs）。initramfs是一个临时的根文件系统，加载到内存中，在Linux系统启动过程中被用来准备真正的根文件系统。</p>
+<p>具体来说，<code>mkinitcpio -P</code>命令的作用包括：</p>
+<ul>
+<li><p><strong>自动检测</strong>：该命令会自动检测<code>/boot</code>目录下所有已安装的Linux内核，并为每个内核生成对应的initramfs。这意味着如果你有多个内核版本（例如，标准Linux内核和LTS版本内核），该命令将为它们每一个重新生成initramfs。</p>
+</li>
+<li><p><strong>应用配置更改</strong>：如果你更改了<code>/etc/mkinitcpio.conf</code>配置文件或者相关的钩子脚本（hooks），使用<code>mkinitcpio -P</code>可以确保这些更改被应用到所有内核的initramfs中。这对于添加驱动、修改启动行为等操作至关重要。</p>
+</li>
+<li><p><strong>修复启动问题</strong>：在某些情况下，如果系统无法启动，可能是因为initramfs损坏或配置不正确。在这种情况下，重新生成initramfs可能有助于解决问题。</p>
+</li>
+<li><p><strong>更新内核后的必要步骤</strong>：当通过包管理器更新Linux内核后，通常会自动重新生成initramfs。然而，在手动安装或更新内核、更改重要的启动配置时，运行<code>mkinitcpio -P</code>确保initramfs是最新的并且包含所有必要的模块和配置。</p>
+</li>
+</ul>
+<h1 id="磁盘"><a href="#磁盘" class="headerlink" title="磁盘"></a>磁盘</h1><h2 id="df命令（Disk-Free）"><a href="#df命令（Disk-Free）" class="headerlink" title="df命令（Disk Free）"></a>df命令（Disk Free）</h2><p>显示 <strong>文件系统级别（挂载的磁盘&#x2F;分区）</strong> 的整体磁盘空间使用情况，包括总容量、已用空间、剩余空间等。-h 后的默认参数为 <code>/</code> ，即根目录，查看的是根目录中所有分区的空间使用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -h <span class="comment"># 以人类可读格式显示</span></span><br></pre></td></tr></table></figure>
+
+<p>若想查看指定一目录的分区的空间使用情况，可以在 -h 后自定义</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">df</span> -h /mnt <span class="comment"># 查看/mnt目录下空间使用情况</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="du命令（Disk-Usage）"><a href="#du命令（Disk-Usage）" class="headerlink" title="du命令（Disk Usage）"></a>du命令（Disk Usage）</h2><p>计算 <strong>文件或目录</strong> 的实际磁盘使用量（递归统计文件和子目录占用的空间）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">du</span> -sh /path/to/dir   <span class="comment"># 统计目录总大小（-s 汇总，-h 易读格式）</span></span><br><span class="line"><span class="built_in">du</span> -ah /path/to/dir   <span class="comment"># 显示目录下所有文件和子目录的详细大小</span></span><br></pre></td></tr></table></figure>
+<h2 id="Smartmontools"><a href="#Smartmontools" class="headerlink" title="Smartmontools"></a>Smartmontools</h2><ol>
+<li>安装 smartmontools</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pacman -S smartmontools</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>使用以下命令获取磁盘设备名称或路径</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdisk -l</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>使用 <code>smartctl</code> 命令来查看磁盘信息：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">smartctl -A /dev/sdx <span class="comment"># 硬盘</span></span><br><span class="line">smartctl -d sat -A /dev/sdx <span class="comment"># USB 设备</span></span><br></pre></td></tr></table></figure>
+<p>   这两个命令的主要区别是添加了 <code>-d</code> 选项，该选项指定驱动程序，以便 <code>smartctl</code> 可以与相应的设备进行通信。<br>   如果需要更加详细的信息，请把 <code>-A</code> 改为 <code>-a</code> 。</p>
+<h2 id="trim"><a href="#trim" class="headerlink" title="trim"></a>trim</h2><ol>
+<li>查看trim定时器状态</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl status fstrim.timer  </span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>手动 trim</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fstrim -a -v</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>-a</code> 或 <code>--all</code>：这个选项指示<code>fstrim</code>命令尝试对所有挂载的文件系统进行trim操作，但它会跳过那些不支持trim的文件系统。</li>
+<li><code>-v</code> 或 <code>--verbose</code>：这个选项让<code>fstrim</code>命令在执行时显示更多信息，特别是关于它对每个文件系统进行了多少trim操作的详细信息。</li>
+</ul>
+<h1 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h1><h2 id="日志清理"><a href="#日志清理" class="headerlink" title="日志清理"></a>日志清理</h2><p>清理最早两周前的日志.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl --vacuum-time=2s</span><br></pre></td></tr></table></figure>
+
+<p>清理日志使总大小小于 100M:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">journalctl --vacuum-size=100M</span><br></pre></td></tr></table></figure>
+
+<h2 id="pacman日志"><a href="#pacman日志" class="headerlink" title="pacman日志"></a>pacman日志</h2><p>一般只会保留数天的记录，使用 cat 抓取就行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /var/log/pacman.log </span><br></pre></td></tr></table></figure>
+
+<h2 id="读取日志"><a href="#读取日志" class="headerlink" title="读取日志"></a>读取日志</h2><p>检查上一次引导（boot）时的系统日志的命令（包括内核和用户空间日志）。依赖 <code>systemd-journald</code> 的持久化存储。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">journalctl -b -1</span><br><span class="line"></span><br><span class="line"><span class="comment"># `-b` 表示启动周期（`boot`），`-1` 表示上一次启动（`-0` 是当前启动，默认值）。</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>直接读取 <strong>内核环形缓冲区</strong>（<code>kernel ring buffer</code>）的内容，记录内核启动过程中和运行时的日志（如硬件检测、驱动加载、内核错误等）。<br>这些日志是内核直接生成的，<strong>不依赖任何日志系统</strong>（如 <code>systemd-journald</code>）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> dmesg</span><br><span class="line"></span><br><span class="line"><span class="comment"># 默认显示当前启动周期的内核日志（重启后会丢失之前的日志）。  </span></span><br><span class="line"><span class="comment"># 可通过 `-T` 或 `--time-format` 选项显示时间戳（需内核支持）。</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h1><h2 id="1-使用ps命令"><a href="#1-使用ps命令" class="headerlink" title="1. 使用ps命令"></a>1. 使用ps命令</h2><p><code>ps</code>命令是一个非常通用的命令，它在几乎所有的Linux发行版中都可用，包括Arch Linux。</p>
+<p>查看当前系统中的所有进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef</span><br></pre></td></tr></table></figure>
+<p>  这里，<code>-e</code>表示显示所有进程，<code>-f</code>表示全格式显示。</p>
+<p>查看与某个用户相关的进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -u &lt;用户名&gt;</span><br></pre></td></tr></table></figure>
+<p>查看某个特定进程的信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -p &lt;进程ID&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-使用top命令"><a href="#2-使用top命令" class="headerlink" title="2. 使用top命令"></a>2. 使用top命令</h2><p><code>top</code>命令提供了一个实时更新的进程列表，显示系统中进程的动态视图。</p>
+<p>启动<code>top</code>命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top</span><br></pre></td></tr></table></figure>
+
+<p><code>top</code>命令会显示一系列的进程信息，包括CPU使用率、内存使用率等。可以在<code>top</code>运行时按键来改变其行为:</p>
+<ol>
+<li>如按<code>P</code>排序显示CPU使用率最高的进程。</li>
+<li>按 <code>q</code> 退出。</li>
+</ol>
+<blockquote>
+<p>可以使用拥有更好交互图形界面的 htop。</p>
+</blockquote>
+<h1 id="蓝牙"><a href="#蓝牙" class="headerlink" title="蓝牙"></a>蓝牙</h1><p>开启蓝牙服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start bluetooth</span><br></pre></td></tr></table></figure>
+
+<h1 id="WIFI-NetworkManager"><a href="#WIFI-NetworkManager" class="headerlink" title="WIFI-NetworkManager"></a>WIFI-NetworkManager</h1><h2 id="nmcli-examples"><a href="#nmcli-examples" class="headerlink" title="nmcli examples"></a>nmcli examples</h2><p><a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/NetworkManager">https://wiki.archlinuxcn.org/wiki/NetworkManager</a></p>
+<p>List nearby Wi-Fi networks:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli device wifi list</span><br></pre></td></tr></table></figure>
+
+<p>Connect to a Wi-Fi network:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli device wifi connect _SSID_or_BSSID_ password _password_</span><br></pre></td></tr></table></figure>
+
+<p>Connect to a hidden Wi-Fi network:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli device wifi connect _SSID_or_BSSID_ password _password_ hidden <span class="built_in">yes</span></span><br></pre></td></tr></table></figure>
+
+<p>Get a list of connections with their names, UUIDs, types and backing devices:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli connection show</span><br></pre></td></tr></table></figure>
+
+<p>Delete a connection:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli connection delete _name_or_uuid_</span><br></pre></td></tr></table></figure>
+
+<p>See a list of network devices and their state:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli device</span><br></pre></td></tr></table></figure>
+
+<p>Turn off Wi-Fi:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmcli radio wifi off</span><br></pre></td></tr></table></figure>
+
+<h1 id="临时粘贴版-fars-ee"><a href="#临时粘贴版-fars-ee" class="headerlink" title="临时粘贴版 fars.ee"></a>临时粘贴版 fars.ee</h1><p>官网： <a target="_blank" rel="noopener" href="http://fars.ee/">http://fars.ee/</a></p>
+<p><del>用于把日志、配置贴到任何人都能访问的网络上，用于让大佬给你分析问题</del></p>
+<blockquote>
+<p>注意隐私</p>
+</blockquote>
+<p>以下为基本使用，更多用法看官网<br>Create a paste from the output of ‘dmesg’:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ dmesg | curl -F <span class="string">&quot;c=@-&quot;</span> <span class="string">&quot;http://fars.ee/&quot;</span></span><br><span class="line"></span><br><span class="line">:<span class="string">&#x27; output</span></span><br><span class="line"><span class="string">long: AGhkV6JANmmQRVssSUzFWa_0VNyq</span></span><br><span class="line"><span class="string">sha1: 686457a240366990455b2c494cc559aff454dcaa</span></span><br><span class="line"><span class="string">short: VNyq</span></span><br><span class="line"><span class="string">url: http://fars.ee/VNyq</span></span><br><span class="line"><span class="string">uuid: 17c5829d-81a0-4eb6-8681-ba72f83ffbf3</span></span><br><span class="line"><span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="显卡"><a href="#显卡" class="headerlink" title="显卡"></a>显卡</h1><p>首先确保已经安装了 <code>mesa-utils</code> 、<code>lib32-nvidia-utils</code>、<code>nvidia-utils</code>、<code>nvidia</code> 和 <code>nvidia-utils</code>等相关驱动（或者AMD的相关包）</p>
+<h2 id="查看当前的显卡渲染器"><a href="#查看当前的显卡渲染器" class="headerlink" title="查看当前的显卡渲染器"></a>查看当前的显卡渲染器</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">glxinfo | grep <span class="string">&quot;OpenGL renderer&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="监控-Nvidia-GPU"><a href="#监控-Nvidia-GPU" class="headerlink" title="监控 Nvidia GPU"></a>监控 Nvidia GPU</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvidia-smi</span><br></pre></td></tr></table></figure>
+
+<h1 id="Archiving-and-compression"><a href="#Archiving-and-compression" class="headerlink" title="Archiving and compression"></a>Archiving and compression</h1><h2 id="推荐算法"><a href="#推荐算法" class="headerlink" title="推荐算法"></a>推荐算法</h2><ul>
+<li>LZMA2(xz)：高压缩率的代表，但是压缩&#x2F;解压占用更多的cpu等资源</li>
+<li>Zstd：是LZMA2和LZ4的平衡，压缩率与速度的性价比很高</li>
+<li>LZ4：极速压缩&#x2F;解压的代表，占用资源低，但是压缩率比较低</li>
+</ul>
+<p>根据数据的冷热自行选择</p>
+<h2 id="bsdtar"><a href="#bsdtar" class="headerlink" title="bsdtar"></a>bsdtar</h2><blockquote>
+<p>提示：GNU 和 BSD tar 都自动为 bzip2、compress、gzip、lzip、lzma、lzop、zstd 和 xz 压缩归档执行解压缩。lz4 只有 BSD tar 支持（但是 GNU tar 可以使用–use-compress-program&#x3D;lz4&#x2F;-Ilz4进行等效操作）。当创建归档文件时，两者都支持-a开关，以根据文件扩展名通过正确的压缩程序自动处理创建的归档。BSD tar 根据格式识别压缩格式，而 GNU tar 只根据文件扩展名猜测压缩格式。</p>
+</blockquote>
+<p><a target="_blank" rel="noopener" href="https://man.archlinux.org/man/bsdtar.1">bsdtar-man手册</a></p>
+<p>常规用法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">First option must be a mode specifier:</span><br><span class="line">  -c Create  -r Add/Replace  -t List  -u Update  -x Extract</span><br><span class="line">Common Options:</span><br><span class="line">  -b <span class="comment">#  Use # 512-byte records per I/O block</span></span><br><span class="line">  -f &lt;filename&gt;  Location of archive (default /dev/st0)</span><br><span class="line">  -v    Verbose</span><br><span class="line">  -w    Interactive</span><br><span class="line">Create: bsdtar -c [options] [&lt;file&gt; | &lt;<span class="built_in">dir</span>&gt; | @&lt;archive&gt; | -C &lt;<span class="built_in">dir</span>&gt; ]</span><br><span class="line">  &lt;file&gt;, &lt;<span class="built_in">dir</span>&gt;  add these items to archive</span><br><span class="line">  -z, -j, -J, --lzma  Compress archive with gzip/bzip2/xz/lzma</span><br><span class="line">  --format &#123;ustar|pax|cpio|shar&#125;  Select archive format</span><br><span class="line">  --exclude &lt;pattern&gt;  Skip files that match pattern</span><br><span class="line">  -C &lt;<span class="built_in">dir</span>&gt;  Change to &lt;<span class="built_in">dir</span>&gt; before processing remaining files</span><br><span class="line">  @&lt;archive&gt;  Add entries from &lt;archive&gt; to output</span><br><span class="line">List: bsdtar -t [options] [&lt;patterns&gt;]</span><br><span class="line">  &lt;patterns&gt;  If specified, list only entries that match</span><br><span class="line">Extract: bsdtar -x [options] [&lt;patterns&gt;]</span><br><span class="line">  &lt;patterns&gt;  If specified, extract only entries that match</span><br><span class="line">  -k    Keep (don<span class="string">&#x27;t overwrite) existing files</span></span><br><span class="line"><span class="string">  -m    Don&#x27;</span>t restore modification <span class="built_in">times</span></span><br><span class="line">  -O    Write entries to stdout, don<span class="string">&#x27;t restore to disk</span></span><br><span class="line"><span class="string">  -p    Restore permissions (including ACLs, owner, file flags)</span></span><br></pre></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bsdtar -cJf &lt;archive_name.tar.xz&gt; [--options xz:compression-level=9] &lt;/path/to/directory&gt;</span><br></pre></td></tr></table></figure>
+
+<p>针对 .tar.xz 文件完整性检查</p>
+<ul>
+<li>bsdtar 的 -t 选项可以列出压缩包内的文件列表，确保元数据正常。如果压缩包损坏，此操作会直接报错。</li>
+<li>通过对比归档的哈希值，确保整个归档未被篡改<br>e.g.</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bsdtar -tvf &lt;filename&gt;</span><br><span class="line"></span><br><span class="line"><span class="built_in">sha256sum</span> &lt;filename&gt;</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/0b5e5b638425/">http://ecamt35.github.io/0b5e5b638425/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Archlinux/">Archlinux</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/b8b5bdbd8486/" title="系统维护日志"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">系统维护日志</div></div><div class="info-2"><div class="info-item-1">随便写下维护系统的东西吧</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/ce269dce74a9/" title="Arch+Labwc 使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-01-23</div><div class="info-item-2">Arch+Labwc 使用</div></div><div class="info-2"><div class="info-item-1">自用系统配置</div></div></div></a><a class="pagination-related" href="/6d8e2f58e408/" title="Arch+River 使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-01</div><div class="info-item-2">Arch+River 使用</div></div><div class="info-2"><div class="info-item-1">自用系统配置</div></div></div></a><a class="pagination-related" href="/b8b5bdbd8486/" title="系统维护日志"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-06-04</div><div class="info-item-2">系统维护日志</div></div><div class="info-2"><div class="info-item-1">随便写下维护系统的东西吧</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8C%85%E7%AE%A1%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">包管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#pacman"><span class="toc-number">1.1.</span> <span class="toc-text">pacman</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%87%E7%BA%A7"><span class="toc-number">1.1.1.</span> <span class="toc-text">升级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">1.1.2.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E5%8E%9F%E5%9B%A0"><span class="toc-number">1.1.3.</span> <span class="toc-text">安装原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2"><span class="toc-number">1.1.4.</span> <span class="toc-text">搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%85%E7%90%86"><span class="toc-number">1.1.5.</span> <span class="toc-text">清理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%B8%E8%BD%BD"><span class="toc-number">1.1.6.</span> <span class="toc-text">卸载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E7%94%A8%E6%B3%95"><span class="toc-number">1.1.7.</span> <span class="toc-text">其他用法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#yay"><span class="toc-number">1.2.</span> <span class="toc-text">yay</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%87%E7%BA%A7-1"><span class="toc-number">1.2.1.</span> <span class="toc-text">升级</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-1"><span class="toc-number">1.2.2.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2-1"><span class="toc-number">1.2.3.</span> <span class="toc-text">搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%B8%E8%BD%BD-1"><span class="toc-number">1.2.4.</span> <span class="toc-text">卸载</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B8%85%E7%90%86-1"><span class="toc-number">1.2.5.</span> <span class="toc-text">清理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E7%94%A8%E6%B3%95-1"><span class="toc-number">1.2.6.</span> <span class="toc-text">其他用法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pacnew%E5%A4%84%E7%90%86"><span class="toc-number">1.3.</span> <span class="toc-text">pacnew处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#mkinitcpio-conf%E5%8F%98%E5%8A%A8"><span class="toc-number">1.4.</span> <span class="toc-text">mkinitcpio.conf变动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mkinitcpio-P"><span class="toc-number">1.4.1.</span> <span class="toc-text">mkinitcpio -P</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%A3%81%E7%9B%98"><span class="toc-number">2.</span> <span class="toc-text">磁盘</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#df%E5%91%BD%E4%BB%A4%EF%BC%88Disk-Free%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">df命令（Disk Free）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#du%E5%91%BD%E4%BB%A4%EF%BC%88Disk-Usage%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">du命令（Disk Usage）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Smartmontools"><span class="toc-number">2.3.</span> <span class="toc-text">Smartmontools</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#trim"><span class="toc-number">2.4.</span> <span class="toc-text">trim</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%97%A5%E5%BF%97"><span class="toc-number">3.</span> <span class="toc-text">日志</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%97%A5%E5%BF%97%E6%B8%85%E7%90%86"><span class="toc-number">3.1.</span> <span class="toc-text">日志清理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pacman%E6%97%A5%E5%BF%97"><span class="toc-number">3.2.</span> <span class="toc-text">pacman日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E6%97%A5%E5%BF%97"><span class="toc-number">3.3.</span> <span class="toc-text">读取日志</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%9B%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">进程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E4%BD%BF%E7%94%A8ps%E5%91%BD%E4%BB%A4"><span class="toc-number">4.1.</span> <span class="toc-text">1. 使用ps命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E4%BD%BF%E7%94%A8top%E5%91%BD%E4%BB%A4"><span class="toc-number">4.2.</span> <span class="toc-text">2. 使用top命令</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%93%9D%E7%89%99"><span class="toc-number">5.</span> <span class="toc-text">蓝牙</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#WIFI-NetworkManager"><span class="toc-number">6.</span> <span class="toc-text">WIFI-NetworkManager</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#nmcli-examples"><span class="toc-number">6.1.</span> <span class="toc-text">nmcli examples</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%B4%E6%97%B6%E7%B2%98%E8%B4%B4%E7%89%88-fars-ee"><span class="toc-number">7.</span> <span class="toc-text">临时粘贴版 fars.ee</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%98%BE%E5%8D%A1"><span class="toc-number">8.</span> <span class="toc-text">显卡</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E7%9A%84%E6%98%BE%E5%8D%A1%E6%B8%B2%E6%9F%93%E5%99%A8"><span class="toc-number">8.1.</span> <span class="toc-text">查看当前的显卡渲染器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7-Nvidia-GPU"><span class="toc-number">8.2.</span> <span class="toc-text">监控 Nvidia GPU</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Archiving-and-compression"><span class="toc-number">9.</span> <span class="toc-text">Archiving and compression</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95"><span class="toc-number">9.1.</span> <span class="toc-text">推荐算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bsdtar"><span class="toc-number">9.2.</span> <span class="toc-text">bsdtar</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术">Linux虚拟网络化与隔离技术</a><time datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/15c78de5d315/" title="Raft阅读随记">Raft阅读随记</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9a0e6259ac11/" title="浅读Raft算法">浅读Raft算法</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/6d8e2f58e408/" title="Arch+River 使用">Arch+River 使用</a><time datetime="2026-01-01T10:30:00.000Z" title="发表于 2026-01-01 18:30:00">2026-01-01</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

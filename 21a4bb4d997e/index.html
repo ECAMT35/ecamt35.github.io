@@ -1,0 +1,498 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>GPG简单使用 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这是仅你所知的秘密; 这是证明我的唯一方式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GPG简单使用">
+<meta property="og:url" content="http://ecamt35.github.io/21a4bb4d997e/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="这是仅你所知的秘密; 这是证明我的唯一方式">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2025-05-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-10T09:33:55.135Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="GPG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "GPG简单使用",
+  "url": "http://ecamt35.github.io/21a4bb4d997e/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2025-05-17T16:00:00.000Z",
+  "dateModified": "2026-02-10T09:33:55.135Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/21a4bb4d997e/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'GPG简单使用',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">GPG简单使用</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">GPG简单使用</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-05-17T16:00:00.000Z" title="发表于 2025-05-18 00:00:00">2025-05-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-10T09:33:55.135Z" title="更新于 2026-02-10 17:33:55">2026-02-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GNU-Linux/">GNU/Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">5.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-02-10 17:33:55&quot;}" hidden></div><p>参考：<br><a target="_blank" rel="noopener" href="https://wiki.archlinux.org/title/GnuPG">https://wiki.archlinux.org/title/GnuPG</a></p>
+<p>介绍：GnuPG 是完整实现了 <a target="_blank" rel="noopener" href="https://tools.ietf.org/html/rfc4880">RFC4880</a>（即PGP）所定义的 <a target="_blank" rel="noopener" href="https://openpgp.org/about/">OpenPGP</a> 标准的自由软件。GnuPG 可以加密和签名你的数据和通讯信息，包含一个通用的密钥管理系统以及用于各种公钥目录的访问模块。GnuPG，简称 GPG，是一个易于与其它程序整合的命令行工具，拥有很多前端程序和函数库。GnuPG 还支持 S&#x2F;MIME 和 Secure Shell (ssh)。</p>
+<h1 id="快速使用"><a href="#快速使用" class="headerlink" title="快速使用"></a>快速使用</h1><h2 id="加密解密"><a href="#加密解密" class="headerlink" title="加密解密"></a>加密解密</h2><p>使用非对称加解密：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -r ECAMT -e 1.png </span><br></pre></td></tr></table></figure>
+
+<p>使用对称加解密：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -c 1.png </span><br></pre></td></tr></table></figure>
+
+<p>查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span> -l</span><br><span class="line">总计 12960</span><br><span class="line">-rw-r--r-- 1 ECAMT ECAMT 6633916 12月 8日 1.png</span><br><span class="line">-rw-r--r-- 1 ECAMT ECAMT 6634809  5月18日 1.png.gpg</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"><span class="comment"># 使用非对称加密</span></span><br><span class="line">file 1.png.gpg </span><br><span class="line">1.png.gpg: data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用对称加密</span></span><br><span class="line">file 1.png.gpg </span><br><span class="line">1.png.gpg: PGP symmetric key encrypted data - AES with 256-bit key salted &amp; iterated - SHA256 .</span><br></pre></td></tr></table></figure>
+
+<p>无论哪种方式加都是使用 <code>-d</code> 解密（使用 <code>&gt;</code> 代替 <code>-o</code> 输出到 <code>2.png</code>）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -d 1.png.gpg &gt; 2.png</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>使用例：加密归档文件</p>
+<p>可以一口气完成归档压缩加密：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bsdtar -cf - -J &lt;path/direction&gt; | gpg -c &gt; &lt;xx.gpg&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>压缩应在加密前：加密后的数据是随机字节，难以被压缩。因此，若需压缩，务必先压缩再加密。</p>
+</blockquote>
+<blockquote>
+<p>仍建议分开归档压缩和加密的步骤，如 <code>xz</code>（LZMA算法）在压缩数据时，其行为会受到输出目标的类型（文件 vs 管道）的影响，使用管道传输传递给gpg时，xz 使用流式压缩模式，每个数据块可能包含额外的头信息和校验值，导致最后的体积略大。</p>
+</blockquote>
+<h2 id="签名校验"><a href="#签名校验" class="headerlink" title="签名校验"></a>签名校验</h2><p>签名主要用于验证数据的完整性、来源真实性以及防止数据被篡改。</p>
+<p>常用签名：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --output &lt;doc.sig&gt; --sign &lt;doc&gt;</span><br></pre></td></tr></table></figure>
+
+<p>校验：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --verify &lt;doc.sig&gt;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>使用例：git提交并签名</p>
+<p>提交时签名：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -S --gpg-sign=ECAMT</span><br></pre></td></tr></table></figure>
+
+<p>查看（需要提前导入公钥）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">log</span> --show-signature</span><br></pre></td></tr></table></figure>
+
+<p>git设置为指定自动私钥签名（仍需要 <code>-S</code> 参数）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git config <span class="built_in">set</span> user.signingKey &lt;user-id&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 校验</span></span><br><span class="line">git config get user.signingKey &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>git设置每次自动签名：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config commit.gpgsign <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>电子邮件完整验证也能用到。</p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><h1 id="主目录"><a href="#主目录" class="headerlink" title="主目录"></a>主目录</h1><p>GnuPG 套件将密钥环和私钥存储在 GnuPG 主目录，并从中读取配置。默认路径为 <code>~/.gnupg</code>。有两种方法可以改变主目录的路径：</p>
+<ul>
+<li>设置 <code>$GNUPGHOME</code> <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F" title="环境变量">环境变量</a>。</li>
+<li>使用 <code>--homedir</code> 参数，如 <code>$ gpg --homedir &lt;/path/to/dir&gt;</code></li>
+</ul>
+<p>默认情况下，<strong>主目录的<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Permissions" title="Permissions">权限</a>设置为 <code>700</code>，其包含的文件的权限设置为 <code>600</code></strong>。只有目录的所有者有权读取、写入和访问文件。这是出于安全目的，不应更改。如果此目录或其中的任何文件不遵循此安全措施，您将收到有关不安全文件和主目录权限的警告。</p>
+<h2 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h2><p>GnuPG 的所有行为都可以通过命令行参数进行配置。对于您希望成为默认参数的参数，可以将它们添加到相应的配置文件中：</p>
+<ul>
+<li>gpg 检查 <code>gnupg_home/gpg.conf</code>（用户）和 <code>/etc/gnupg/gpg.conf</code>（全局）。由于 gpg 是 GnuPG 的主要入口点，因此大部分感兴趣的配置都在这里。请参阅 <a target="_blank" rel="noopener" href="https://www.gnupg.org/documentation/manuals/gnupg/GPG-Options.html">GPG 选项</a> 获取可能的选项。</li>
+<li>dirmngr 会检查 <code>gnupg_home/dirmngr.conf</code> 和 <code>/etc/gnupg/dirmngr.conf</code> 两个配置文件。dirmngr 是由 gpg 内部调用的程序，用于访问 PGP 密钥服务器。请参阅 <a target="_blank" rel="noopener" href="https://www.gnupg.org/documentation/manuals/gnupg/Dirmngr-Options.html">Dirmngr 选项</a> 以了解可能的选项。</li>
+</ul>
+<p>这两个配置文件涵盖了常见用例，但 GnuPG  套件中还有更多带有自己选项的辅助程序。请参阅 <a target="_blank" rel="noopener" href="https://www.gnupg.org/documentation/manuals/gnupg/index.html">GnuPG 手册</a> 获取详细列表。</p>
+<p>创建所需的文件，并按照 主目录 章节中讨论的方法设置其权限为600。</p>
+<p>在这些文件中添加任何你想要的长选项。不要写两个破折号，只需写选项的名称和所需的参数。例如，要始终使GnuPG在特定路径上使用密钥环，就像使用 <code>gpg --no-default-keyring --keyring keyring-path ...</code> 调用它一样： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gnupg_home/gpg.conf (或 /etc/gnupg/gpg.conf)</span><br><span class="line">---</span><br><span class="line">no-default-keyring</span><br><span class="line">keyring &lt;keyring-path&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="新用户的默认选项"><a href="#新用户的默认选项" class="headerlink" title="新用户的默认选项"></a>新用户的默认选项</h2><p>要给新建用户设定一些默认选项，把配置文件放到 <code>/etc/skel/.gnupg/</code>。系统创建新用户时，就会把文件复制到 GnuPG 目录。还有一个 <em>addgnupghome</em> 命令可以为已有用户创建新 GnuPG 主目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">addgnupghome user1 user2</span><br></pre></td></tr></table></figure>
+
+<p>此命令会检查 <code>/home/user1/.gnupg/</code> 和 <code>/home/user2/.gnupg/</code>，并从 skeleton 目录复制文件过去。具有已存在的 GnuPG 主目录的用户只需跳过即可。</p>
+<h1 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h1><blockquote>
+<p>注意：</p>
+<ul>
+<li>如果需要一个 <em><code>user-id</code></em>，可以使用 key ID、指纹、用户名或电邮地址的部分等替代，GnuPG 对此的处理很灵活。</li>
+<li>如果需要一个 <em><code>key-id</code></em>，可以给命令加上 <code>--keyid-format=long</code> 选项来查询。例如，如果想要查看主密匙，可以使用<code>gpg --list-secret-keys --keyid-format=long user-id</code>命令，<em>key-id</em> 是和 <em>sec</em> 同一行的十六进制散列值。</li>
+</ul>
+</blockquote>
+<h2 id="创建密钥对"><a href="#创建密钥对" class="headerlink" title="创建密钥对"></a>创建密钥对</h2><p>用下面命令创建一个密钥对：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --full-gen-key</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>--expert</code> 选项可以选择其它的加密算法，尤其是较新的<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E6%A4%AD%E5%9C%86%E6%9B%B2%E7%BA%BF%E5%AF%86%E7%A0%81%E5%AD%A6" title="zhwp:椭圆曲线密码学">ECC（椭圆曲线加密）</a>。</p>
+<p>命令执行后会需要用户回答一些问题，大部分用户应该需要的是：</p>
+<ul>
+<li>默认的“RSA 和 RSA”用于加密和解密。</li>
+<li>默认的密钥长度，即 3072。增大长度到 4096“成本极高，但获益很少”。<a target="_blank" rel="noopener" href="https://www.gnupg.org/faq/gnupg-faq.html#no_default_of_rsa4096">这个帖子说明了为何 GPG 不默认使用 RSA-4096</a>。</li>
+<li>过期日期。大部分用户可以选择一年。这样即使无法访问密钥环，用户也知道密钥已经过期。如果有需要，可以不重新签发密钥就延长过期时间。</li>
+<li>用户名和电子邮件。可以给同样的密钥不同的身份，比如给同一个密钥关联多个电子邮件。</li>
+<li><strong>不填写</strong>可选注释。注释字段并没有被<a target="_blank" rel="noopener" href="https://lists.gnupg.org/pipermail/gnupg-devel/2015-July/030150.html">很好地定义</a>，作用有限。</li>
+<li>一个安全的密钥口令。可参考<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Security#%E9%80%89%E6%8B%A9%E5%AE%89%E5%85%A8%E7%9A%84%E5%AF%86%E7%A0%81" title="Security">如何选择安全的密码</a>。</li>
+</ul>
+<blockquote>
+<p>注意：任何导入密钥的人都可以看到这里的用户名和电子邮件地址。</p>
+</blockquote>
+<blockquote>
+<p>提示：较简单的 <code>--gen-key</code> 选项对密钥类型、密钥长度、过期时间均使用默认值，仅询问姓名和电邮地址。</p>
+</blockquote>
+<h2 id="查看密钥"><a href="#查看密钥" class="headerlink" title="查看密钥"></a>查看密钥</h2><p>查看公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --list-keys</span><br></pre></td></tr></table></figure>
+
+<p>查看私钥:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --list-secret-keys</span><br></pre></td></tr></table></figure>
+
+<h2 id="导出公钥"><a href="#导出公钥" class="headerlink" title="导出公钥"></a>导出公钥</h2><p>GPG 的主要用途是通过公钥加密信息以确保其私密性。你可以分发自己的公钥，而其他人通过该公钥加密发给你的信息。而你的私钥必须<strong>始终</strong>保密，否则将会威胁信息的私密性。相关内容，请参见<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%85%AC%E5%BC%80%E5%AF%86%E9%92%A5%E5%8A%A0%E5%AF%86" title="zhwp:公开密钥加密">公开密钥加密</a>。</p>
+<p>所以其他人需要有你的公钥才能给你发加密信息。</p>
+<p>以下命令可生成公钥的 ASCII 版本（<code>--armor</code> 参数）（例如用于以电子邮件发布）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --<span class="built_in">export</span> --armor --output &lt;public-key.asc&gt; &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>此外，还可以通过<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E4%BD%BF%E7%94%A8%E5%85%AC%E9%92%A5%E6%9C%8D%E5%8A%A1%E5%99%A8">密钥服务器</a>分发公钥。</p>
+<blockquote>
+<p>提示：</p>
+<ul>
+<li>使用 <code>--no-emit-version</code> 可以避免打印版本号，通过配置文件也可以进行此设置。</li>
+<li>可以省略 <code>user-id</code> 以导出密钥环内所有的公钥。这可以用来分享多个身份，或是将其导入到另一个程序，比如 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Thunderbird#Use_OpenPGP_with_external_GnuPG" title="Thunderbird">Thunderbird</a>。</li>
+</ul>
+</blockquote>
+<h2 id="导入公共密钥"><a href="#导入公共密钥" class="headerlink" title="导入公共密钥"></a>导入公共密钥</h2><p>要给其他人发送加密信息，或者验证他们的签名，就需要他们的公钥。通过文件 <code>public.key</code> 导入公钥到密钥环：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --import &lt;public.key.asc&gt;</span><br></pre></td></tr></table></figure>
+
+<p>此外，还可以通过<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E5%AF%86%E9%92%A5%E6%9C%8D%E5%8A%A1%E5%99%A8">#密钥服务器</a>导入公钥。</p>
+<h2 id="使用公钥服务器"><a href="#使用公钥服务器" class="headerlink" title="使用公钥服务器"></a>使用公钥服务器</h2><h3 id="发布公钥"><a href="#发布公钥" class="headerlink" title="发布公钥"></a>发布公钥</h3><p>你可以将你的公钥注册到一个公共的密钥服务器，这样其他人不用联系你就能获取到你的公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --send-keys &lt;key-id&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>警告：一旦一个公钥被发送到密钥服务器，它就无法从服务器上删除。<a target="_blank" rel="noopener" href="https://pgp.mit.edu/faq.html">这个网页</a>解释了原因。</p>
+</blockquote>
+<blockquote>
+<p>注意：与公钥相关联的电邮地址一旦公开，可能会被垃圾邮件发送者盯上。请做好相应的防护措施。</p>
+</blockquote>
+<h3 id="搜索和接收公钥"><a href="#搜索和接收公钥" class="headerlink" title="搜索和接收公钥"></a>搜索和接收公钥</h3><p>要查询公钥的详细信息而不是导入，执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --search-keys &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>要导入一个公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --receive-keys &lt;key-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>要使用密钥服务器中的最新版本刷新&#x2F;更新钥匙串：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --refresh-keys</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>警告：</p>
+<ul>
+<li>您应该通过将其指纹与所有者在独立来源（例如直接联系该人）上发布的指纹进行比较，以验证检索到的公钥的真实性。请参阅 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Public_key_fingerprint" title="wikipedia:Public key fingerprint">Wikipedia:Public key fingerprint</a> 获取更多信息。</li>
+<li>接收密钥时，建议使用长密钥 ID 或完整指纹。使用短密钥 ID 可能会导致冲突。所有具有短密钥 ID 的密钥都将被导入，参见 <a target="_blank" rel="noopener" href="https://lore.kernel.org/lkml/20160815153401.9EC2BADC2C@smtp.postman.i2p/">在野外发现的伪密钥</a>作为示例。</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>提示：将 <code>auto-key-retrieve</code> 添加到 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#Configuration_files">GPG 配置文件</a>中，将在需要时自动从密钥服务器获取密钥。这不会对安全性造成妥协，但可以被视为<strong>侵犯隐私</strong>；请参阅<a target="_blank" rel="noopener" href="https://man.archlinux.org/man/gpg.1">gpg(1)</a>中的”web bug”。</p>
+</blockquote>
+<h3 id="公钥服务器"><a href="#公钥服务器" class="headerlink" title="公钥服务器"></a>公钥服务器</h3><p>常见的公钥服务器：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://keyserver.ubuntu.com/">Ubuntu Keyserver</a>：联盟式（federated）、没有验证、公钥不可删除。</li>
+<li><a target="_blank" rel="noopener" href="https://keys.mailvelope.com/">Mailvelope Keyserver</a>：中心式、验证电邮 ID、公钥可删除。</li>
+<li><a target="_blank" rel="noopener" href="https://keys.openpgp.org/">keys.openpgp.org</a>：中心式、验证电邮 ID、公钥可删除、没有第三方签名（即不支持信任网络）。</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Key_server_(cryptographic)#Keyserver_examples" title="wikipedia:Key server (cryptographic)">维基百科（英文）</a>上有更多的服务器。</p>
+<p>备选公钥服务器可以在 配置文件 中的 <code>keyserver</code> 选项中注明，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.gnupg/dirmngr.conf</span><br><span class="line">---</span><br><span class="line">keyserver hkp://keyserver.ubuntu.com</span><br></pre></td></tr></table></figure>
+
+<p>当常规服务器无法正常工作时，临时使用另一台服务器很方便。例如，可以通过以下方法实现：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --keyserver &lt;hkps://keys.openpgp.org/&gt; --search-keys &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="加密与解密"><a href="#加密与解密" class="headerlink" title="加密与解密"></a>加密与解密</h1><h2 id="非对称加解密"><a href="#非对称加解密" class="headerlink" title="非对称加解密"></a>非对称加解密</h2><p>在加密（参数<code>--encrypt</code>或<code>-e</code>）一个文件或一条信息给另外一个人（参数<code>--recipient</code>或<code>-r</code>）之前，你需要先导入他的公钥。如果你还没有创建自己的密钥对，请先创建。</p>
+<p>要加密一个名为 doc 的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --recipient &lt;user-id&gt; --encrypt &lt;doc&gt;</span><br></pre></td></tr></table></figure>
+
+<p>要解密（参数 <code>--decrypt</code> 或 <code>-d</code>）一个用你的公钥加密的、名为 <em>doc</em>.gpg 的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --output &lt;doc&gt; --decrypt &lt;doc.gpg&gt;</span><br></pre></td></tr></table></figure>
+
+<p><em>gpg</em> 会提示你输入密钥口令，并将 <em>doc</em>.gpg 中的数据解密到 <em>doc</em>。如果你忽略了参数 <code>-o</code>（<code>--output</code>），<em>gpg</em> 将会直接输出解密的信息。</p>
+<blockquote>
+<p>提示：</p>
+<ul>
+<li>使用参数 <code>--armor</code> 以 ASCII 编码的形式加密文件（适用于复制与粘贴文本文件格式的消息）。</li>
+<li>使用 <code>-R &lt;user-id&gt;</code> 或 <code>--hidden-recipient &lt;user-id&gt;</code> 代替 <code>-r</code> 可以不将收件人的指纹 ID 放入加密的消息中。这有助于隐藏收件人的信息，是针对流量分析的一个有限对策。</li>
+<li>使用 <code>--no-emit-version</code> 以避免打印版本号。也可将相应配置添加到你的配置文件中。</li>
+<li>你可以使用 GPG 将自己作为收件人来加密敏感文件，但是每次只能压缩一个文件——尽管你可以将多个文件压缩后再进行加密。如果需要加密一个目录或一整个文件系统，请参见 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Data-at-rest_encryption#Available_methods" title="Data-at-rest encryption">Data-at-rest encryption#Available methods</a>。</li>
+</ul>
+</blockquote>
+<h2 id="对称加解密"><a href="#对称加解密" class="headerlink" title="对称加解密"></a>对称加解密</h2><p>对称加密不需要生成密钥对，可用来简单地给文件加上密码。使用 <code>-c</code>&#x2F;<code>--symmetric</code> 参数来进行对称加密：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -c &lt;doc&gt;</span><br></pre></td></tr></table></figure>
+
+<p>下面的例子：</p>
+<ul>
+<li>用口令给 <code>doc</code> 进行了对称加密</li>
+<li>用 AES-256 加密算法对口令进行加密</li>
+<li>用 SHA-512 摘要算法对口令进行打乱</li>
+<li>打乱 65536 次</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg -c --s2k-cipher-algo AES256 --s2k-digest-algo SHA512 --s2k-count 65536 doc</span><br></pre></td></tr></table></figure>
+
+<p>下面的命令可解密以口令对称加密的 <code>doc.gpg</code> 文件，并将解密的文档输出到同一目录下的 <code>doc</code> 文件中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --output &lt;doc&gt; --decrypt &lt;doc&gt;.gpg</span><br></pre></td></tr></table></figure>
+
+<p>解密时有时不需要输入密码，原因是 gpg-agent 缓存了。</p>
+<h2 id="目录操作"><a href="#目录操作" class="headerlink" title="目录操作"></a>目录操作</h2><p>可用 <a target="_blank" rel="noopener" href="https://man.archlinux.org/man/gpgtar.1">gpgtar(1)</a> 对目录进行加密和解密。</p>
+<p>加密：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpgtar -c -o &lt;dir.gpg&gt; &lt;<span class="built_in">dir</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<p>解密：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpgtar -d &lt;dir.gpg&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="签名"><a href="#签名" class="headerlink" title="签名"></a>签名</h1><p>签名用于认证和时间戳文档。如果文档被修改，验证签名将失败。与使用公钥加密文档不同，签名是使用用户的私钥创建的。文档的接收者然后使用发送者的公钥验证签名。</p>
+<h2 id="签署文件"><a href="#签署文件" class="headerlink" title="签署文件"></a>签署文件</h2><p>要签署文件，请使用<code>-s</code>&#x2F;<code>--sign</code>标志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --output &lt;doc.sig&gt; --sign &lt;doc&gt;</span><br></pre></td></tr></table></figure>
+
+<p><code>doc.sig</code>包含原始文件<code>doc</code>的压缩内容和以二进制格式表示的签名，但文件并未加密。但是，您可以将签名与加密结合使用。</p>
+<h2 id="以可读形式签名文件或消息"><a href="#以可读形式签名文件或消息" class="headerlink" title="以可读形式签名文件或消息"></a>以可读形式签名文件或消息</h2><p>要签署文件而无需将其压缩为二进制格式，请使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --output &lt;doc&gt;.sig --clearsign &lt;doc&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在这里，原始文件<code>doc</code>的内容和签名以可读形式存储在<code>doc.sig</code>中。</p>
+<h2 id="创建独立的签名文件"><a href="#创建独立的签名文件" class="headerlink" title="创建独立的签名文件"></a>创建独立的签名文件</h2><p>要创建一个单独的签名文件，以便与文档或文件本身份开分发，请使用<code>--detach-sig</code>标志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --output &lt;doc.sig&gt; --detach-sig &lt;doc&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在这里，签名存储在<code>doc.sig</code>中，但<code>doc</code>的内容不会存储在其中。这种方法常用于分发软件项目，以允许用户验证程序未被第三方修改。</p>
+<h2 id="验证签名"><a href="#验证签名" class="headerlink" title="验证签名"></a>验证签名</h2><p>要验证签名，请使用<code>--verify</code>标志：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --verify &lt;doc.sig&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>doc.sig</code>是包含您要验证的签名的已签名文件。</p>
+<p>如果您要验证一个已分离签名，验证时必须同时存在已签名的数据文件和签名文件。例如，要验证 Arch Linux 的最新 iso 文件，您可以执行以下操作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --verify &lt;archlinux-version.iso.sig&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>archlinux-version.iso</code>必须位于相同的目录中。</p>
+<p>您还可以使用第二个参数指定已签名的数据文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --verify &lt;archlinux-version.iso.sig&gt; &lt;/path/to/archlinux-version.iso&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果一个文件除了被签名外还被加密，只需<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E5%8A%A0%E5%AF%86%E5%92%8C%E8%A7%A3%E5%AF%86">解密</a>该文件，其签名也将被验证。</p>
+<h1 id="密钥维护"><a href="#密钥维护" class="headerlink" title="密钥维护"></a>密钥维护</h1><h2 id="备份你的私钥"><a href="#备份你的私钥" class="headerlink" title="备份你的私钥"></a>备份你的私钥</h2><p>用如下命令备份你的私钥。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --export-secret-keys --armor --output &lt;private-key.asc&gt; &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>请注意，上述命令将要求您输入密钥的密码。这是因为，否则任何获得上述导出文件访问权限的人都可以像您一样对文档进行加密和签名，而无需知道您的密码。</p>
+<p><strong>警告：</strong></p>
+<ul>
+<li>口令通常是密钥安全方面最薄弱的环节。最好把导出的文件放在另一个系统或者设备里，比如物理保险柜或者加密驱动器中。这是当你遇到设备被盗、磁盘故障等情况时恢复对密钥控制权的唯一安全措施。</li>
+<li>这种备份方式有一些安全局限性，这篇文章 <a target="_blank" rel="noopener" href="https://web.archive.org/web/20210803213236/https://habd.as/post/moving-gpg-keys-privately/">https://web.archive.org/web/20210803213236/https://habd.as/post/moving-gpg-keys-privately/</a> 中有关于用 <em>gpg</em> 备份和导入密钥的更加安全的办法。</li>
+</ul>
+<p>用如下命令导入你的私钥备份</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --import &lt;private-key.asc&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>提示：</strong> 你可以用 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Paperkey" title="Paperkey">Paperkey</a> 来把私钥导出为明文文本或条形码，并打印出来存档。</p>
+<h2 id="备份你的吊销证书"><a href="#备份你的吊销证书" class="headerlink" title="备份你的吊销证书"></a>备份你的吊销证书</h2><p>若使用gpg公钥服务器</p>
+<p>生成新密钥对的时候会同时生成吊销证书，默认存放在 <code>~/.gnupg/openpgp-revocs.d/</code> 下，证书的文件名是对应的密钥的指纹。 你也可以用以下命令手动生成吊销证书：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --gen-revoke --armor --output &lt;revcert.asc&gt; &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果密钥丢失或泄露，此证书可用于 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E5%90%8A%E9%94%80%E5%AF%86%E9%92%A5">#吊销密钥</a>。如果你无法访问密钥，则无法使用上述命令生成新的吊销证书，那么备份将非常有用。吊销证书很短，你可以把他打印出来然后在需要使用的时候手动输入到电脑里。</p>
+<blockquote>
+<p>警告：任何能接触到吊销证书的人都可以吊销你的密钥对，而且无法撤消。所以请像保护私钥一样保护你的吊销证书。</p>
+</blockquote>
+<h2 id="编辑你的密钥"><a href="#编辑你的密钥" class="headerlink" title="编辑你的密钥"></a>编辑你的密钥</h2><p>运行 <code>gpg --edit-key &lt;user-id&gt;</code> 命令将会出现一个菜单，该菜单使你能够执行大部分密钥管理相关的任务。</p>
+<p>在编辑密钥子菜单中输入 <code>help</code> 命令可以显示完整的命令列表。以下是一些有用的命令：</p>
+<blockquote>
+<p>passwd       # 修改密码短语<br>clean        # 压缩任何不再可用的用户ID（例如已撤销或已过期）<br>revkey       # 撤销密钥<br>addkey       # 向该密钥添加子密钥<br>expire       # 更改密钥过期时间<br>adduid       # 添加附加的名称、注释和电子邮件地址<br>addphoto     # 向密钥添加照片（必须是JPG格式，推荐大小为240x288，当提示时输入完整路径）</p>
+</blockquote>
+<blockquote>
+<p>提示：如果你有多个电子邮件账户，你可以使用 <code>adduid</code> 命令将每个账户都添加为一个身份。然后你可以将你最喜欢的账户设置为 <code>primary</code>。</p>
+</blockquote>
+<h2 id="删除密钥对"><a href="#删除密钥对" class="headerlink" title="删除密钥对"></a>删除密钥对</h2><p>删除私钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --delete-secret-key &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>删除私钥后，需单独删除公钥：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --delete-key &lt;user-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>校验：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gpg --list-keys</span><br><span class="line">gpg --list-secret-keys</span><br></pre></td></tr></table></figure>
+
+<h1 id="gpg-agent"><a href="#gpg-agent" class="headerlink" title="gpg-agent"></a>gpg-agent</h1><p><em>gpg-agent</em> 主要用作守护进程，用于请求和缓存密钥链的密码。这在外部程序（如邮件客户端）使用 GnuPG 时十分有用。 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=gnupg">gnupg</a>包 带有默认自动启动的 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Systemd/%E7%94%A8%E6%88%B7" title="Systemd&#x2F;用户">systemd&#x2F;用户</a>套接字。这些套接字分别是 <code>gpg-agent.socket</code>、<code>gpg-agent-extra.socket</code>、<code>gpg-agent-browser.socket</code>、<code>gpg-agent-ssh.socket</code> 和 <code>dirmngr.socket</code>。</p>
+<ul>
+<li><em>gpg</em> 使用 <code>gpg-agent.socket</code> 连接到 <em>gpg-agent</em> 守护进程。</li>
+<li><code>gpg-agent-extra.socket</code> 的作用是在本地建立一个转发自远程系统的 Unix 域套接字。这样就可以在远程系统上使用 <em>gpg</em>，而无需向远程系统公开私钥。有关详细信息，请参阅 <a target="_blank" rel="noopener" href="https://man.archlinux.org/man/gpg-agent.1">gpg-agent(1)</a>。</li>
+<li><code>gpg-agent-browser.socket</code> 允许 Web 浏览器访问 <em>gpg-agent</em> 守护进程。</li>
+<li><a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/SSH" title="SSH">SSH</a> 使用 <code>gpg-agent-ssh.socket</code> 缓存 <em>ssh-add</em> 程序添加的 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/SSH_keys" title="SSH keys">SSH keys</a>。有关必要的配置，请参阅 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#SSH_agent">#SSH agent</a>。</li>
+<li><code>dirmngr.socket</code> 启动一个 GnuPG 守护进程来处理与 keyserver 的连接。</li>
+</ul>
+<blockquote>
+<p>注意：如果您没有使用默认的 GnuPG <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E7%9B%AE%E5%BD%95%E4%BD%8D%E7%BD%AE">#目录位置</a>, 您需要<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Systemd#%E4%BF%AE%E6%94%B9%E7%8E%B0%E5%AD%98%E5%8D%95%E5%85%83%E6%96%87%E4%BB%B6" title="Systemd">编辑</a>所有套接字文件让其使用 <code>gpgconf --list-dirs</code> 的值。 套接字名称使用 <a target="_blank" rel="noopener" href="https://github.com/gpg/gnupg/blob/260bbb4ab27eab0a8d4fb68592b0d1c20d80179c/common/homedir.c#L710-L713">非默认 GnuPG 主目录的哈希</a>，您可以硬编码它不用担心它的改变。</p>
+</blockquote>
+<h2 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h2><p>gpg-agent 用 <code>~/.gnupg/gpg-agent.conf</code> 文件配置。配置选项列在 <a target="_blank" rel="noopener" href="https://man.archlinux.org/man/gpg-agent.1">gpg-agent(1)</a> 中。例如，您可以更改默认密钥的缓存 ttl：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.gnupg/gpg-agent.conf</span><br><span class="line">---</span><br><span class="line">default-cache-ttl 3600</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>提示：要缓存整个会话的密码(passphrase)，请运行以下命令：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/gnupg/gpg-preset-passphrase --preset XXXXX</span><br></pre></td></tr></table></figure>
+
+<p>其中 XXXXX 是 keygrip。您可以在运行 <code>gpg --with-keygrip -K</code> 时获取它的值。密码(passphrase)将一直保存到 <code>gpg-agent</code> 重新启动为止。如果设置了 <code>default-cache-ttl</code> 值，会优先采用它。</p>
+<p>在 Linux 中，为了允许预设的密码短语，需要通过使用 <code>--allow-preset-passphrase</code> 启动 gpg-agent，或在 <code>~/.gnupg/gpg-agent.conf</code> 中设置<code>allow-preset-passphrase</code>。</p>
+<h2 id="重新加载-gpg-agent"><a href="#重新加载-gpg-agent" class="headerlink" title="重新加载 gpg-agent"></a>重新加载 gpg-agent</h2><p>在修改完配置之后，用 <em>gpg-connect-agent</em> 重新加载 gpg-agent：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg-connect-agent reloadagent /bye</span><br></pre></td></tr></table></figure>
+
+<p>该命令应该输出 <code>OK</code>。</p>
+<p>但是在某些情况下，只是重新启动可能不够，比如当 <code>keep-screen</code> 被添加到 gpg-agent 配置中时。在这种情况下，您首先需要终止正在进行的 gpg-agent 进程，然后按上述方法重新启动它。</p>
+<h2 id="pinentry"><a href="#pinentry" class="headerlink" title="pinentry"></a>pinentry</h2><p><code>gpg-agent</code> 可以在 <code>pinentry-program</code> 中设定，以便使用特定的 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=pinentry">pinentry</a>包 用户界面来提示用户输入(passphrase)。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.gnupg/gpg-agent.conf</span><br><span class="line">---</span><br><span class="line">pinentry-program /usr/bin/pinentry-curses</span><br></pre></td></tr></table></figure>
+
+<p>还有其他 pinentry 程序可选，参考 <code>pacman -Ql pinentry | grep /usr/bin/</code> 的输出结果。</p>
+<blockquote>
+<p>提示：</p>
+<ul>
+<li>为了使用 <code>/usr/bin/pinentry-kwallet</code> 您需要安装软件包 <a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/kwalletcli/">kwalletcli</a>AUR。</li>
+<li>所有的默认 pinentry 程序（除了 <code>/usr/bin/pinentry-emacs</code>）都支持 <a target="_blank" rel="noopener" href="https://specifications.freedesktop.org/secret-service/">DBus Secret Service API</a> ，它允许通过一个兼容的管理器(如 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GNOME_Keyring" title="GNOME Keyring">GNOME Keyring</a> 或 <a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wzh/index.php?title=KeePass&action=edit&redlink=1" title="KeePass（页面不存在）">KeePassXC</a>)记住密码。</li>
+</ul>
+</blockquote>
+<p>记得在修改完配置后要<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD_gpg-agent">#重新加载 gpg-agent</a>。</p>
+<h2 id="缓存密码"><a href="#缓存密码" class="headerlink" title="缓存密码"></a>缓存密码</h2><p><code>max-cache-ttl</code> 和 <code>default-cache-ttl</code> 定义 gpg-agent 的密码缓存时间（秒）。要在会话中只输入一次密码，设置一个非常高的值即可，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gpg-agent.conf</span><br><span class="line">---</span><br><span class="line">max-cache-ttl 60480000</span><br><span class="line">default-cache-ttl 60480000</span><br></pre></td></tr></table></figure>
+
+<p>对于 SSH 仿真模式下的密码缓存，需要设置 <code>default-cache-ttl-ssh</code> 和 <code>max-cache-ttl-ssh</code>，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gpg-agent.conf</span><br><span class="line">---</span><br><span class="line">default-cache-ttl-ssh 60480000</span><br><span class="line">max-cache-ttl-ssh 60480000</span><br></pre></td></tr></table></figure>
+
+<h2 id="Unattended-passphrase"><a href="#Unattended-passphrase" class="headerlink" title="Unattended passphrase"></a>Unattended passphrase</h2><p>从 GnuPG 2.1.0 开始，需要使用 gpg-agent 和 pinentry，这可能会破坏使用 <code>--passphrase-fd 0</code> 命令行选项从 STDIN 传入的密码短语的向后兼容性。为了拥有与旧版本相同类型的功能，必须做两件事：</p>
+<p>首先，编辑 gpg-agent 配置允许 <em>loopback</em> pinentry 模式 :</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.gnupg/gpg-agent.conf</span><br><span class="line">---</span><br><span class="line">allow-loopback-pinentry</span><br></pre></td></tr></table></figure>
+
+<p>如果 gpg-agent 正在运行，<a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/GnuPG#%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD_gpg-agent">重新加载</a>它使配置生效。</p>
+<p>其次，要么应用程序需要更新，以包括一个命令行参数来使用回环模式，例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gpg --pinentry-mode loopback ...</span><br></pre></td></tr></table></figure>
+
+<p>如果不可能这样做，则可以将选项添加到配置中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">~/.gnupg/gpg.conf</span><br><span class="line">---</span><br><span class="line">pinentry-mode loopback</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上游作者指出，在 <code>gpg.conf</code> 中设置 <code>pinentry-mode loopback</code> 可能会破坏其他用法，如果可能，最好使用命令行选项。<br><a target="_blank" rel="noopener" href="https://dev.gnupg.org/T1772">https://dev.gnupg.org/T1772</a></p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/21a4bb4d997e/">http://ecamt35.github.io/21a4bb4d997e/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/GPG/">GPG</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/fa2bcf65db26/" title="CAP与分布式系统"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">CAP与分布式系统</div></div><div class="info-2"><div class="info-item-1">CAP理论与理解</div></div></div></a><a class="pagination-related" href="/322ab9175e3b/" title="父子任务共用线程池导致死锁"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">父子任务共用线程池导致死锁</div></div><div class="info-2"><div class="info-item-1">父子任务共用线程池导致死锁</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">快速使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E5%AF%86%E8%A7%A3%E5%AF%86"><span class="toc-number">1.1.</span> <span class="toc-text">加密解密</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AD%BE%E5%90%8D%E6%A0%A1%E9%AA%8C"><span class="toc-number">1.2.</span> <span class="toc-text">签名校验</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-number">2.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BB%E7%9B%AE%E5%BD%95"><span class="toc-number">3.</span> <span class="toc-text">主目录</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-number">3.1.</span> <span class="toc-text">配置文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B0%E7%94%A8%E6%88%B7%E7%9A%84%E9%BB%98%E8%AE%A4%E9%80%89%E9%A1%B9"><span class="toc-number">3.2.</span> <span class="toc-text">新用户的默认选项</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%94%A8%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">用法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E5%AF%86%E9%92%A5%E5%AF%B9"><span class="toc-number">4.1.</span> <span class="toc-text">创建密钥对</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E5%AF%86%E9%92%A5"><span class="toc-number">4.2.</span> <span class="toc-text">查看密钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BC%E5%87%BA%E5%85%AC%E9%92%A5"><span class="toc-number">4.3.</span> <span class="toc-text">导出公钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%BC%E5%85%A5%E5%85%AC%E5%85%B1%E5%AF%86%E9%92%A5"><span class="toc-number">4.4.</span> <span class="toc-text">导入公共密钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%85%AC%E9%92%A5%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">4.5.</span> <span class="toc-text">使用公钥服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%91%E5%B8%83%E5%85%AC%E9%92%A5"><span class="toc-number">4.5.1.</span> <span class="toc-text">发布公钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%90%9C%E7%B4%A2%E5%92%8C%E6%8E%A5%E6%94%B6%E5%85%AC%E9%92%A5"><span class="toc-number">4.5.2.</span> <span class="toc-text">搜索和接收公钥</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E9%92%A5%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">4.5.3.</span> <span class="toc-text">公钥服务器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8A%A0%E5%AF%86%E4%B8%8E%E8%A7%A3%E5%AF%86"><span class="toc-number">5.</span> <span class="toc-text">加密与解密</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E8%A7%A3%E5%AF%86"><span class="toc-number">5.1.</span> <span class="toc-text">非对称加解密</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E7%A7%B0%E5%8A%A0%E8%A7%A3%E5%AF%86"><span class="toc-number">5.2.</span> <span class="toc-text">对称加解密</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95%E6%93%8D%E4%BD%9C"><span class="toc-number">5.3.</span> <span class="toc-text">目录操作</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AD%BE%E5%90%8D"><span class="toc-number">6.</span> <span class="toc-text">签名</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AD%BE%E7%BD%B2%E6%96%87%E4%BB%B6"><span class="toc-number">6.1.</span> <span class="toc-text">签署文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A5%E5%8F%AF%E8%AF%BB%E5%BD%A2%E5%BC%8F%E7%AD%BE%E5%90%8D%E6%96%87%E4%BB%B6%E6%88%96%E6%B6%88%E6%81%AF"><span class="toc-number">6.2.</span> <span class="toc-text">以可读形式签名文件或消息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E7%8B%AC%E7%AB%8B%E7%9A%84%E7%AD%BE%E5%90%8D%E6%96%87%E4%BB%B6"><span class="toc-number">6.3.</span> <span class="toc-text">创建独立的签名文件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%AD%BE%E5%90%8D"><span class="toc-number">6.4.</span> <span class="toc-text">验证签名</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%86%E9%92%A5%E7%BB%B4%E6%8A%A4"><span class="toc-number">7.</span> <span class="toc-text">密钥维护</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%87%E4%BB%BD%E4%BD%A0%E7%9A%84%E7%A7%81%E9%92%A5"><span class="toc-number">7.1.</span> <span class="toc-text">备份你的私钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%87%E4%BB%BD%E4%BD%A0%E7%9A%84%E5%90%8A%E9%94%80%E8%AF%81%E4%B9%A6"><span class="toc-number">7.2.</span> <span class="toc-text">备份你的吊销证书</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%96%E8%BE%91%E4%BD%A0%E7%9A%84%E5%AF%86%E9%92%A5"><span class="toc-number">7.3.</span> <span class="toc-text">编辑你的密钥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%AF%86%E9%92%A5%E5%AF%B9"><span class="toc-number">7.4.</span> <span class="toc-text">删除密钥对</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#gpg-agent"><span class="toc-number">8.</span> <span class="toc-text">gpg-agent</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE-1"><span class="toc-number">8.1.</span> <span class="toc-text">配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E6%96%B0%E5%8A%A0%E8%BD%BD-gpg-agent"><span class="toc-number">8.2.</span> <span class="toc-text">重新加载 gpg-agent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pinentry"><span class="toc-number">8.3.</span> <span class="toc-text">pinentry</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E5%AF%86%E7%A0%81"><span class="toc-number">8.4.</span> <span class="toc-text">缓存密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Unattended-passphrase"><span class="toc-number">8.5.</span> <span class="toc-text">Unattended passphrase</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术">Linux虚拟网络化与隔离技术</a><time datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/15c78de5d315/" title="Raft阅读随记">Raft阅读随记</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9a0e6259ac11/" title="浅读Raft算法">浅读Raft算法</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/6d8e2f58e408/" title="Arch+River 使用">Arch+River 使用</a><time datetime="2026-01-01T10:30:00.000Z" title="发表于 2026-01-01 18:30:00">2026-01-01</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
