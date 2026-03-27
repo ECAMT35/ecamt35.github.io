@@ -1,0 +1,768 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>负载均衡 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="负载均衡">
+<meta property="og:type" content="article">
+<meta property="og:title" content="负载均衡">
+<meta property="og:url" content="http://ecamt35.github.io/221c331ea1c6/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="负载均衡">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2026-03-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-03-21T16:00:00.000Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="分布式系统">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "负载均衡",
+  "url": "http://ecamt35.github.io/221c331ea1c6/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2026-03-21T16:00:00.000Z",
+  "dateModified": "2026-03-21T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/221c331ea1c6/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '负载均衡',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">21</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">负载均衡</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">负载均衡</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-21T16:00:00.000Z" title="发表于 2026-03-22 00:00:00">2026-03-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-21T16:00:00.000Z" title="更新于 2026-03-22 00:00:00">2026-03-22</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%90%86%E8%AE%BA/">技术理论</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">7.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>21分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-03-22 00:00:00&quot;}" hidden></div><p>负载均衡，本质上就是在<strong>多个可提供相同服务的后端节点之间，合理分配流量</strong>。  </p>
+<p>它的目标通常有三个：</p>
+<ol>
+<li><strong>提升吞吐量</strong>：让多台机器一起承担请求</li>
+<li><strong>提高可用性</strong>：某个节点坏了，流量可以绕开它</li>
+<li><strong>改善响应时间</strong>：避免部分节点过载、部分节点空闲</li>
+</ol>
+<p>负载均衡分为硬件负载均衡和软件负载均衡</p>
+<p><strong>硬件负载均衡</strong>通常是专门的网络设备，比如早年常见的 F5 一类产品。<br>它们通常具有：</p>
+<ul>
+<li>专用硬件</li>
+<li>高性能转发能力</li>
+<li>完整的网络能力和商业支持</li>
+<li>较成熟的高可用方案</li>
+</ul>
+<p>它的优点很明显：性能强、稳定、功能全。<br>缺点也很明显：<strong>贵、重、灵活性相对差、运维和扩展成本高</strong>。</p>
+<p><strong>软件负载均衡</strong>就是用软件程序在通用服务器上完成流量分配。常见的有：</p>
+<ul>
+<li><strong>LVS</strong></li>
+<li><strong>Nginx</strong></li>
+<li><strong>HAProxy</strong></li>
+<li><strong>Envoy</strong></li>
+</ul>
+<p>它的优势在于：</p>
+<ul>
+<li>部署灵活</li>
+<li>成本低</li>
+<li>易于自动化</li>
+<li>容易与容器、微服务、Kubernetes 等体系结合</li>
+<li>便于定制路由策略、熔断、限流、观测等功能</li>
+</ul>
+<p>现在的多数互联网系统、云原生平台、内部服务网格，更关心的其实都是<strong>软件负载均衡</strong>。<br>因为它不只是“分发流量”，还经常承担协议代理、服务治理、故障隔离、灰度发布这些职责。</p>
+<p>所以本章重点讲软件。</p>
+<h1 id="软件负载均衡工作流程"><a href="#软件负载均衡工作流程" class="headerlink" title="软件负载均衡工作流程"></a>软件负载均衡工作流程</h1><p>从工程实现上看，软件负载均衡做的事情并不只是“把请求分出去”这么简单。<br>它通常至少要完成下面几件事：</p>
+<ul>
+<li>接收客户端请求或连接</li>
+<li>在多个后端节点中选择一个合适的目标</li>
+<li>将流量转发过去</li>
+<li>持续检查后端节点是否健康</li>
+<li>在节点异常时停止分发流量</li>
+<li>在节点恢复后重新接入</li>
+<li>统计连接数、延迟、错误率等运行指标</li>
+</ul>
+<p>也就是说，软件负载均衡本质上是一个<strong>流量分发与运行时调度系统</strong>。<br>算法只是其中一部分，健康检查、故障摘除、状态维护、流量控制同样重要。</p>
+<p>软件负载均衡通常可以工作在两个层次：四层和七层。</p>
+<h2 id="四层负载均衡（L4）"><a href="#四层负载均衡（L4）" class="headerlink" title="四层负载均衡（L4）"></a>四层负载均衡（L4）</h2><p>四层负载均衡基于传输层信息进行转发，主要看：</p>
+<ul>
+<li>源 IP、目标 IP</li>
+<li>源端口、目标端口</li>
+<li>TCP、UDP</li>
+</ul>
+<p>它并不关心 HTTP 的 URL、Header、Cookie 这些应用层内容。<br>也就是说，它只负责把连接转发到某个后端，而不理解业务请求本身。</p>
+<p>它的特点通常是：</p>
+<ul>
+<li>性能高</li>
+<li>转发开销小</li>
+<li>更适合大流量 TCP&#x2F;UDP 场景</li>
+</ul>
+<p>四层负载均衡的典型代表是 LVS&#x2F;IPVS。，以及很多内核态、高性能网络设备。</p>
+<h2 id="七层负载均衡（L7）"><a href="#七层负载均衡（L7）" class="headerlink" title="七层负载均衡（L7）"></a>七层负载均衡（L7）</h2><p>七层负载均衡基于应用层协议做转发，最常见的是 HTTP&#x2F;HTTPS，也包括 gRPC 等。<br>它能看到并利用更多信息，比如：</p>
+<ul>
+<li>Host</li>
+<li>URL Path</li>
+<li>Header</li>
+<li>Cookie</li>
+<li>请求方法</li>
+<li>TLS 信息</li>
+</ul>
+<p>因此它不仅能做“分发”，还可以做更细粒度的路由和治理，例如：</p>
+<ul>
+<li>按域名转发</li>
+<li>按路径转发</li>
+<li>按请求头转发</li>
+<li>灰度发布</li>
+<li>金丝雀发布</li>
+<li>鉴权、限流、熔断</li>
+</ul>
+<p>特点是：</p>
+<ul>
+<li>更灵活</li>
+<li>可以做更复杂的流量治理</li>
+<li>但开销通常高于四层</li>
+</ul>
+<p>Nginx、HAProxy、Envoy 则通常以七层代理能力见长，不过它们也都支持一定的四层转发能力，只是在工程实践中更常被作为七层代理来使用。</p>
+<p>可以简单理解为：</p>
+<ul>
+<li><strong>L4 更像高性能交通分流</strong></li>
+<li><strong>L7 更像懂业务规则的调度员</strong></li>
+</ul>
+<h1 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h1><p>负载均衡不只是“平均分请求”<br>1 号请求给 A，2 号请求给 B，3 号请求给 C；这是最简单的场景。  </p>
+<p>现实系统里，后端节点往往不是完全等价的：</p>
+<ul>
+<li>有的机器配置更强</li>
+<li>有的机器当前连接更多</li>
+<li>有的请求处理时间更长</li>
+<li>有的节点刚恢复，不能立刻灌满流量</li>
+<li>有些业务要求同一用户尽量命中同一节点</li>
+<li>有些服务是长连接，连接数和请求数并不等价</li>
+<li>有些集群会动态扩缩容</li>
+</ul>
+<p>所以“怎么选后端”这件事，最后就演变成了各种<strong>负载均衡算法</strong>。</p>
+<h2 id="轮询（Round-Robin）"><a href="#轮询（Round-Robin）" class="headerlink" title="轮询（Round Robin）"></a>轮询（Round Robin）</h2><p>轮询是最经典、最直观的算法。<br>它的做法很简单：请求依次分给每个后端节点。</p>
+<p>假设有三个节点 A、B、C，请求分配顺序可能是：<br>A → B → C → A → B → C</p>
+<p>优点：</p>
+<ul>
+<li>实现简单</li>
+<li>开销低</li>
+<li>节点性能接近时效果不错</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>不考虑节点当前负载</li>
+<li>不考虑请求差异</li>
+<li>长连接场景下效果未必理想</li>
+</ul>
+<p>因此，轮询适合这样一些场景：</p>
+<ul>
+<li>节点配置差不多</li>
+<li>请求处理耗时比较接近</li>
+<li>系统规模不大，追求简单稳定</li>
+</ul>
+<h2 id="加权轮询（Weighted-Round-Robin）"><a href="#加权轮询（Weighted-Round-Robin）" class="headerlink" title="加权轮询（Weighted Round Robin）"></a>加权轮询（Weighted Round Robin）</h2><p>现实里节点性能往往不同。比如：</p>
+<ul>
+<li>A：16 核</li>
+<li>B：8 核</li>
+<li>C：8 核</li>
+</ul>
+<p>如果还是简单轮询，A 的能力就浪费了。加权轮询就是给不同节点不同权重，例如：</p>
+<ul>
+<li>A：权重 4</li>
+<li>B：权重 2</li>
+<li>C：权重 2</li>
+</ul>
+<p>流量分布大致就会变成 4:2:2。</p>
+<p>优点：</p>
+<ul>
+<li>允许异构机器按能力分担流量</li>
+<li>实现仍然比较直接</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>仍然不感知实时负载</li>
+<li>权重设置不准时，效果会打折</li>
+</ul>
+<p>所以它更适合：</p>
+<ul>
+<li>节点能力不一致</li>
+<li>请求分布相对平稳</li>
+<li>不需要强实时负载感知</li>
+</ul>
+<h2 id="随机（Random）"><a href="#随机（Random）" class="headerlink" title="随机（Random）"></a>随机（Random）</h2><p>随机选择一个后端节点。<br>表面上看很粗糙，但在节点多、请求量足够大时，随机分布并不会太差。<br>某些系统里甚至会偏爱简单随机，因为它足够轻量。</p>
+<p>优点：</p>
+<ul>
+<li>实现极简</li>
+<li>并发下容易扩展</li>
+<li>在大样本下分布通常还可以</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>小样本下波动大</li>
+<li>不考虑节点差异和实时状态</li>
+</ul>
+<p>适用场景：</p>
+<ul>
+<li>大规模集群</li>
+<li>对绝对均匀性要求没那么高</li>
+<li>更看重低开销</li>
+</ul>
+<h2 id="两次随机选择（Power-of-Two-Choices）"><a href="#两次随机选择（Power-of-Two-Choices）" class="headerlink" title="两次随机选择（Power of Two Choices）"></a>两次随机选择（Power of Two Choices）</h2><p>这是一个非常值得认真理解的算法。它比“纯随机”多走一步，但效果往往明显更好。</p>
+<p>做法是：</p>
+<ol>
+<li>随机选两个节点</li>
+<li>比较它们当前负载</li>
+<li>选择更轻的那个（当前活跃连接数、当前未完成请求数、平均响应时间…）</li>
+</ol>
+<p>这个方法非常有名，因为它用极低的代价，往往就能接近复杂调度算法的效果。<br>纯随机可能碰巧一直打到忙节点。而“两次随机”会给系统一点“纠偏能力”，把请求偏向更空闲的节点。</p>
+<p>优点：</p>
+<ul>
+<li>成本低</li>
+<li>效果通常显著优于纯随机</li>
+<li>很适合大规模分布式系统</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要一个“负载指标”，比如连接数、并发请求数、队列长度</li>
+<li>指标不准确时会影响效果</li>
+</ul>
+<p>适用场景：</p>
+<ul>
+<li>节点多</li>
+<li>需要低成本又不错的均衡效果</li>
+<li>常用于现代分布式系统中的客户端负载均衡或代理层调度</li>
+</ul>
+<h2 id="最少连接（Least-Connections）"><a href="#最少连接（Least-Connections）" class="headerlink" title="最少连接（Least Connections）"></a>最少连接（Least Connections）</h2><p>这类算法认为：<strong>当前连接数更少的节点，通常更空闲</strong>。所以每次把请求分给活跃连接数最少的节点。</p>
+<p>优点</p>
+<ul>
+<li>比轮询更能反映实时负载</li>
+<li>对长连接场景更友好</li>
+<li>在连接持续时间差异较大时优于轮询</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>“连接数少”不一定意味着“真的轻”</li>
+<li>一个连接可能很闲，也可能很重</li>
+<li>对 HTTP&#x2F;2、多路复用场景，需要重新理解“连接”的意义</li>
+</ul>
+<p>适用场景：</p>
+<ul>
+<li>TCP 长连接服务</li>
+<li>请求处理时间差异较大</li>
+<li>连接数与资源占用存在较强相关性</li>
+</ul>
+<p>实现思路：负载均衡器维护每个后端的活动连接数：</p>
+<ul>
+<li>新连接建立：计数 +1</li>
+<li>连接关闭：计数 -1</li>
+</ul>
+<p>每次调度选择计数最小的节点。<br>如果是请求级转发而不是连接级转发，也可能维护“活跃请求数”而不是“活跃连接数”。</p>
+<h2 id="加权最少连接（Weighted-Least-Connections）"><a href="#加权最少连接（Weighted-Least-Connections）" class="headerlink" title="加权最少连接（Weighted Least Connections）"></a>加权最少连接（Weighted Least Connections）</h2><p>这是对最少连接的扩展。因为节点能力不同，不能只看绝对连接数。</p>
+<p>例如：</p>
+<ul>
+<li>A 权重 2，当前连接 20</li>
+<li>B 权重 1，当前连接 12</li>
+</ul>
+<p>直觉上，A 并不一定比 B 更忙。<br>所以通常比较的是类似下面这样的指标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">active_connections / weight</span><br></pre></td></tr></table></figure>
+
+<p>谁更小，就优先选谁。</p>
+<p>优点：</p>
+<ul>
+<li>同时考虑了实时负载和节点能力</li>
+<li>比简单最少连接更实用</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>仍然依赖“连接数能够代表负载”这个假设</li>
+<li>权重和实际处理能力未必线性对应</li>
+</ul>
+<p>实现思路：<br>维护节点的 <code>active_conn</code>、<code>weight</code>，调度时选择 <code>active_conn / weight</code> 最小的节点。</p>
+<p>实际实现可能会做整数化或近似计算，避免浮点开销。</p>
+<h2 id="最短响应时间-最低延迟（Least-Response-Time）"><a href="#最短响应时间-最低延迟（Least-Response-Time）" class="headerlink" title="最短响应时间 &#x2F; 最低延迟（Least Response Time）"></a>最短响应时间 &#x2F; 最低延迟（Least Response Time）</h2><p>这类算法关注的是<strong>延迟表现</strong>。<br>如果某个节点响应更快，就让更多流量去它那边。</p>
+<p>比起“连接数”，延迟往往更贴近用户体验。<br>但它也更难处理，因为延迟会波动，而且容易被瞬时噪声影响。</p>
+<p>优点：</p>
+<ul>
+<li>更关注真实服务质量</li>
+<li>适合对响应时间敏感的系统</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>指标抖动大</li>
+<li>容易形成“越快越给流量，越给流量越变慢”的震荡</li>
+<li>需要平滑和限流机制</li>
+</ul>
+<p>适用场景：</p>
+<ul>
+<li>对时延敏感</li>
+<li>监控指标采集完善</li>
+<li>能接受更复杂的调度逻辑</li>
+</ul>
+<p>实现思路：<br>常见做法不是直接用“最近一次响应时间”，而是用平滑后的指标，例如：</p>
+<ul>
+<li>滑动平均</li>
+<li>指数加权移动平均（EWMA）</li>
+</ul>
+<p>记某节点最近观察到的延迟为 <code>rtt</code>，平滑值为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">score = alpha * new_rtt + (1 - alpha) * old_score</span><br></pre></td></tr></table></figure>
+
+<p>调度时选 <code>score</code> 最小的节点。</p>
+<p>有些系统还会结合并发数，构造更稳健的负载分数，比如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">score = latency * active_requests</span><br></pre></td></tr></table></figure>
+
+<p>这更接近“预估排队时间”。</p>
+<h2 id="基于哈希的负载均衡（Hash-Based）"><a href="#基于哈希的负载均衡（Hash-Based）" class="headerlink" title="基于哈希的负载均衡（Hash-Based）"></a>基于哈希的负载均衡（Hash-Based）</h2><p>这一类算法不追求“每个请求都均匀分发”，而是追求<strong>同一类请求尽量命中同一节点</strong>。<br>可哈希的键可以是：</p>
+<ul>
+<li>客户端 IP</li>
+<li>用户 ID</li>
+<li>Session ID</li>
+<li>URL</li>
+<li>某个业务字段</li>
+</ul>
+<p>优点</p>
+<ul>
+<li>天然支持粘性会话</li>
+<li>有利于缓存命中</li>
+<li>某些业务分片很自然</li>
+</ul>
+<p>缺点</p>
+<ul>
+<li>容易分布不均</li>
+<li>节点增减时映射变化可能很大</li>
+<li>热点用户或热点 key 会导致热点节点</li>
+</ul>
+<h3 id="IP-Hash"><a href="#IP-Hash" class="headerlink" title="IP Hash"></a>IP Hash</h3><p>对客户端 IP 做哈希，映射到某个后端。<br>这样同一个客户端通常总会落到同一台机器上。</p>
+<h3 id="URL-Hash"><a href="#URL-Hash" class="headerlink" title="URL Hash"></a>URL Hash</h3><p>对 URL 做哈希，常用于缓存系统，让相同内容尽量命中同一缓存节点。</p>
+<h3 id="Header-Cookie-User-ID-Hash"><a href="#Header-Cookie-User-ID-Hash" class="headerlink" title="Header &#x2F; Cookie &#x2F; User ID Hash"></a>Header &#x2F; Cookie &#x2F; User ID Hash</h3><p>适合需要会话粘性、租户隔离或业务路由的场景。</p>
+<p>实现思路：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">index = hash(key) % N</span><br></pre></td></tr></table></figure>
+
+<p>但这个方法在节点数量变化时问题很大。<br>比如从 4 个节点变成 5 个节点，大量 key 的映射都会改变，缓存命中率会骤降。</p>
+<p>所以工程上通常会继续使用<strong>一致性哈希</strong>。</p>
+<h2 id="一致性哈希（Consistent-Hashing）"><a href="#一致性哈希（Consistent-Hashing）" class="headerlink" title="一致性哈希（Consistent Hashing）"></a>一致性哈希（Consistent Hashing）</h2><p>一致性哈希是分布式系统里非常经典的思想。<br>它的核心目标不是“最均匀”，而是：<strong>当节点增减时，只让少量 key 重新分配</strong>。</p>
+<p>可以把哈希空间想成一个环。节点和请求 key 都映射到这个环上：</p>
+<ul>
+<li>节点映射成若干个点</li>
+<li>key 映射到环上的某个位置</li>
+<li>key 顺时针找到的第一个节点，就是它的目标节点</li>
+</ul>
+<p>当一个节点下线或新增时，只会影响环上相邻的一部分 key，<br>而不会像 <code>hash(key) % N</code> 那样让全局大量 key 洗牌。</p>
+<p>真实系统里，直接把每个节点只放一个点到环上，通常不够均匀。<br>所以会给每个物理节点分配多个<strong>虚拟节点</strong>。能力更强的物理节点，可以分配更多虚拟节点，从而承担更多流量。</p>
+<p>优点：</p>
+<ul>
+<li>节点增减时扰动小</li>
+<li>适合缓存、分布式存储、会话路由</li>
+<li>能自然支持权重</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>实现比普通哈希复杂</li>
+<li>仍要考虑热点 key</li>
+<li>对请求实时负载不敏感</li>
+</ul>
+<p>适用场景</p>
+<ul>
+<li>缓存集群</li>
+<li>分布式 KV</li>
+<li>需要粘性路由且节点动态变化的系统</li>
+</ul>
+<h2 id="最少请求-最短队列（Least-Requests-Shortest-Queue）"><a href="#最少请求-最短队列（Least-Requests-Shortest-Queue）" class="headerlink" title="最少请求 &#x2F; 最短队列（Least Requests &#x2F; Shortest Queue）"></a>最少请求 &#x2F; 最短队列（Least Requests &#x2F; Shortest Queue）</h2><p>有些系统更关心当前“还没处理完的请求数”，而不是 TCP 连接数。<br>尤其在 HTTP&#x2F;1.1 keep-alive、HTTP&#x2F;2、多路复用场景下，连接数和负载并不总一致。</p>
+<p>优点：</p>
+<ul>
+<li>比连接数更接近真实服务压力</li>
+<li>适合代理层按请求粒度调度</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要更细粒度的统计</li>
+<li>指标采集开销略高</li>
+<li>对请求重量差异仍然无法完全覆盖</li>
+</ul>
+<p>实现思路：<br>维护每个后端节点：</p>
+<ul>
+<li>正在处理的请求数</li>
+<li>请求完成时递减</li>
+<li>新请求到来时选择最小值节点</li>
+</ul>
+<p>很多现代代理会把这个指标作为基础负载信号之一。</p>
+<h1 id="算法的场景总结"><a href="#算法的场景总结" class="headerlink" title="算法的场景总结"></a>算法的场景总结</h1><p>讨论负载均衡算法时，一个常见误区是：总想找一个“最先进”的算法。<br>其实大多数时候并不存在统一最优解。</p>
+<p>可以粗略地这样理解：</p>
+<ul>
+<li><strong>轮询 &#x2F; 加权轮询</strong>：简单稳定，适合节点和请求都比较均匀的场景</li>
+<li><strong>最少连接 &#x2F; 最少请求</strong>：适合负载会波动、请求持续时间差异较大的场景</li>
+<li><strong>最短响应时间 &#x2F; EWMA</strong>：适合更关注时延质量的场景</li>
+<li><strong>哈希 &#x2F; 一致性哈希</strong>：适合需要粘性、缓存命中、分片稳定性的场景</li>
+<li><strong>两次随机选择</strong>：适合规模大、想要低成本高收益的场景</li>
+</ul>
+<p>真正的工程实践常常不是只用一种算法，而是<strong>算法 + 规则 + 健康检查 + 限流 + 观测</strong>共同构成一个可工作的系统。</p>
+<h1 id="软件负载均衡在工程上的实现"><a href="#软件负载均衡在工程上的实现" class="headerlink" title="软件负载均衡在工程上的实现"></a>软件负载均衡在工程上的实现</h1><p>因为真正的负载均衡器不是一个简单的“选节点函数”，而是一套完整的运行时机制。往往由下面这些模块组成。</p>
+<h2 id="后端节点管理"><a href="#后端节点管理" class="headerlink" title="后端节点管理"></a>后端节点管理</h2><p>首先要维护一个后端节点池。每个节点至少会有这些信息：</p>
+<ul>
+<li>IP、端口</li>
+<li>权重</li>
+<li>健康状态</li>
+<li>当前连接数 &#x2F; 请求数</li>
+<li>延迟指标</li>
+<li>失败次数</li>
+<li>最近一次健康检查时间</li>
+<li>是否处于 drain（摘流）状态</li>
+</ul>
+<p>这本质上是一份持续变化的运行时状态表。</p>
+<h2 id="健康检查"><a href="#健康检查" class="headerlink" title="健康检查"></a>健康检查</h2><p>健康检查是负载均衡实现里最关键的部分之一。<br>因为再好的算法，如果还在把流量发给故障节点，整个系统一样会出问题。</p>
+<p>健康检查一般分为两种：</p>
+<p><strong>主动健康检查</strong><br>由负载均衡器主动探测后端，例如：</p>
+<ul>
+<li>TCP 连接是否能建立</li>
+<li>HTTP <code>/health</code> 是否返回 200</li>
+<li>gRPC 健康检查接口是否正常</li>
+<li>检查响应时间、返回内容</li>
+</ul>
+<p><strong>被动健康检查</strong><br>根据真实业务请求结果判断，例如：</p>
+<ul>
+<li>连续连接失败</li>
+<li>连续 5xx</li>
+<li>超时比例异常升高</li>
+</ul>
+<p>实际系统中，通常会把两者结合使用。<br>主动检查能较早发现问题，被动检查能更贴近真实业务状态。</p>
+<p>实现要点一般会考虑：连续失败多少次才标记为 unhealthy？连续成功多少次才恢复？<br>不能太频繁，也不能太慢，避免健康检查本身变成负担。</p>
+<p>这背后其实体现的是一个原则：<strong>状态切换不要太敏感，否则系统会抖动。</strong></p>
+<h2 id="连接处理模型"><a href="#连接处理模型" class="headerlink" title="连接处理模型"></a>连接处理模型</h2><p>软件负载均衡器通常是高并发网络程序，所以需要一个高效的 IO 模型。</p>
+<p>常见实现方式包括：</p>
+<ul>
+<li><code>select</code></li>
+<li><code>poll</code></li>
+<li><code>epoll</code></li>
+<li><code>kqueue</code></li>
+<li>io_uring（更现代）</li>
+<li>用户态网络栈 &#x2F; DPDK（更极致性能场景）</li>
+</ul>
+<p>在 Linux 世界里，很多成熟实现主要基于：</p>
+<ul>
+<li><strong>epoll + 非阻塞 socket</strong></li>
+<li><strong>多进程 &#x2F; 多线程 worker</strong></li>
+<li><strong>事件驱动模型</strong></li>
+</ul>
+<p>这类模型的核心思想是：<br>不要为每个连接都分配一个阻塞线程，而是通过事件循环统一管理大量连接。</p>
+<p>如果负载均衡器本身效率不高，它就会成为新的瓶颈。<br>所以软件负载均衡不仅要“分得对”，还要“转得快”。</p>
+<h2 id="转发模式"><a href="#转发模式" class="headerlink" title="转发模式"></a>转发模式</h2><p>软件负载均衡不只有一种转发方式。</p>
+<h3 id="反向代理模式"><a href="#反向代理模式" class="headerlink" title="反向代理模式"></a>反向代理模式</h3><p>这是七层负载均衡最常见的方式。<br>客户端连接的是 LB，LB 再去连接后端。</p>
+<p>流程是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Client -&gt; Load Balancer -&gt; Backend</span><br></pre></td></tr></table></figure>
+
+<p>优点：</p>
+<ul>
+<li>控制力强</li>
+<li>能做 HTTP 路由、Header 改写、TLS 终止、压缩、鉴权等</li>
+<li>适合应用层治理</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>LB 需要真正参与数据收发</li>
+<li>性能开销更大</li>
+</ul>
+<p>Nginx、HAProxy、Envoy 多属于这类思路。</p>
+<h3 id="NAT-DR-TUN-等内核转发模式"><a href="#NAT-DR-TUN-等内核转发模式" class="headerlink" title="NAT &#x2F; DR &#x2F; TUN 等内核转发模式"></a>NAT &#x2F; DR &#x2F; TUN 等内核转发模式</h3><p>这是四层高性能转发的常见路径。<br>以 LVS 为代表，它有几种经典模式：</p>
+<ul>
+<li>NAT</li>
+<li>DR（Direct Routing）</li>
+<li>TUN（IP Tunnel）</li>
+</ul>
+<p>这里不展开协议细节，只讲直观理解：</p>
+<ul>
+<li>有些模式下，回包也经过 LB、</li>
+<li>有些模式下，请求经过 LB，但响应直接由后端回客户端，从而减轻 LB 压力</li>
+</ul>
+<p>这也是为什么四层方案常能做到很高性能。</p>
+<h2 id="会话保持（Session-Persistence）"><a href="#会话保持（Session-Persistence）" class="headerlink" title="会话保持（Session Persistence）"></a>会话保持（Session Persistence）</h2><p>有些业务并不是“任何请求落到任何节点都一样”。例如：</p>
+<ul>
+<li>会话状态存在本地内存</li>
+<li>WebSocket 需要保持长连接</li>
+<li>本地缓存命中很重要</li>
+<li>某些用户相关数据在单节点上更热</li>
+</ul>
+<p>这时候需要“粘性会话”，即尽量让同一用户落到同一节点。</p>
+<p>实现方式通常有：</p>
+<ul>
+<li>IP Hash</li>
+<li>Cookie 插入或识别</li>
+<li>Session ID Hash</li>
+<li>一致性哈希</li>
+</ul>
+<p>但需要注意，会话保持和负载均衡本身是有张力的。</p>
+<p>粘性越强，请求分布就越不自由；<br>分布越不自由，越容易出现热点。</p>
+<p>所以现代系统更推荐把状态外置，例如放到 Redis、数据库、分布式缓存中，尽量减少对强粘性路由的依赖。</p>
+<h2 id="动态权重与慢启动（Slow-Start）"><a href="#动态权重与慢启动（Slow-Start）" class="headerlink" title="动态权重与慢启动（Slow Start）"></a>动态权重与慢启动（Slow Start）</h2><p>一个节点刚刚恢复时，如果立刻把满额流量打过去，常常会再次被压垮。<br>因此很多系统会使用<strong>慢启动</strong>机制。</p>
+<p>思路：</p>
+<p>节点恢复后，不立即给它完整权重，而是：</p>
+<ul>
+<li>先给少量流量</li>
+<li>再逐渐提升到目标权重</li>
+</ul>
+<p>这样可以让：</p>
+<ul>
+<li>JVM 预热</li>
+<li>缓存回温</li>
+<li>连接池逐步建立</li>
+<li>局部状态恢复</li>
+</ul>
+<p>实现方式：</p>
+<p>恢复节点的有效权重 <code>effective_weight</code> 从较小值开始，按时间或成功请求数逐步增加，直到达到配置权重。</p>
+<h2 id="连接摘除与优雅下线（Draining）"><a href="#连接摘除与优雅下线（Draining）" class="headerlink" title="连接摘除与优雅下线（Draining）"></a>连接摘除与优雅下线（Draining）</h2><p>节点下线时，不能粗暴地直接杀掉。<br>否则会中断现有连接，影响用户请求。</p>
+<p>更合理的方式是：</p>
+<ul>
+<li>先停止给该节点分配新请求</li>
+<li>允许已有连接自然结束</li>
+<li>等活动连接清零后再真正移除</li>
+</ul>
+<p>这就是 drain。<br>很多负载均衡器和容器编排系统都会支持这类能力。</p>
+<h2 id="重试、超时、熔断"><a href="#重试、超时、熔断" class="headerlink" title="重试、超时、熔断"></a>重试、超时、熔断</h2><p>软件负载均衡在应用层经常还会负责一定程度的容错。</p>
+<p>超时：<br>请求不能无限等。连接超时、读超时、写超时都要有边界。</p>
+<p>重试：<br>某个后端失败后，是否允许重试到另一个节点？<br>这很常见，但要谨慎。 因为重试会放大流量，如果系统已经过载，盲目重试可能雪上加霜。</p>
+<p>熔断：<br>如果某节点或某服务整体异常，应该暂时减少甚至停止向它发送请求。这可以避免故障扩散。<br>所以现代七层负载均衡器经常不只是 LB，还兼有部分<strong>服务治理代理</strong>的角色。</p>
+<h1 id="几种典型软件负载均衡器的风格差异"><a href="#几种典型软件负载均衡器的风格差异" class="headerlink" title="几种典型软件负载均衡器的风格差异"></a>几种典型软件负载均衡器的风格差异</h1><p>这里不做产品清单式介绍，只简单说一下各自气质。</p>
+<p><strong>LVS</strong>：</p>
+<ul>
+<li>更偏四层</li>
+<li>高性能</li>
+<li>靠近内核网络层</li>
+<li>适合做大流量入口转发</li>
+</ul>
+<p><strong>Nginx</strong>：</p>
+<ul>
+<li>七层能力成熟</li>
+<li>HTTP 生态强</li>
+<li>配置和部署普及度很高</li>
+<li>反向代理、静态资源、网关、负载均衡常一起做</li>
+</ul>
+<p><strong>HAProxy</strong>：</p>
+<ul>
+<li>在代理和负载均衡领域非常成熟</li>
+<li>性能、稳定性、调度策略都很强</li>
+<li>在很多高要求场景里很常见</li>
+</ul>
+<p><strong>Envoy</strong>：</p>
+<ul>
+<li>面向现代微服务</li>
+<li>对 xDS、动态配置、可观测性、服务网格更友好</li>
+<li>在云原生体系里地位很高</li>
+</ul>
+<p>简单来说：</p>
+<ul>
+<li>如果更关注高性能四层转发，常会想到 <strong>LVS</strong></li>
+<li>如果更关注 Web 入口与 HTTP 路由，常会想到 <strong>Nginx</strong></li>
+<li>如果更关注专业代理能力，常会想到 <strong>HAProxy</strong></li>
+<li>如果更关注微服务治理和云原生体系，常会想到 <strong>Envoy</strong></li>
+</ul>
+<h1 id="分层分布式流量调度"><a href="#分层分布式流量调度" class="headerlink" title="分层分布式流量调度"></a>分层分布式流量调度</h1><p>前面讨论的很多内容，默认都是一种比较经典的结构：<br><strong>一个负载均衡器，对应一组后端节点。</strong></p>
+<p>也就是说，客户端请求先到 LB，再由 LB 决定把流量分给哪台后端机器。<br>这种方式在单体应用、传统集群或者规模不太大的系统里很好理解，也很常见。</p>
+<p>但当系统继续变大之后，负载均衡往往就不再只是“前面放一个 LB”这么简单。<br>原因确实有一部分是为了避免<strong>单个 LB 本身成为性能瓶颈</strong>，但这并不是全部。<br>更重要的是，随着系统层次变多，流量分发这件事本身也会分散到不同位置，由多个组件共同完成。</p>
+<p>换句话说，大型系统里的负载均衡，往往不是一个单点动作，而是一组分层完成的动作。</p>
+<h2 id="负载均衡的分层"><a href="#负载均衡的分层" class="headerlink" title="负载均衡的分层"></a>负载均衡的分层</h2><p>为什么单机式的负载均衡模型会逐渐不够？</p>
+<p>最直接的原因，是单个 LB 可能会成为瓶颈。<br>如果所有请求都必须先经过同一个负载均衡器，那么即使后端有很多机器，前面的 LB 仍然可能先达到极限。这时系统的上限，不再取决于后端整体能力，而取决于入口这一层能承受多少流量。</p>
+<p>但更深一层的原因在于，大型系统中的流量并不只发生一次分发。</p>
+<p>在一个规模较小的系统里，通常只有“用户请求进入应用服务器”这一层流量调度。<br>而在复杂系统中，请求往往会经历多个阶段，例如：</p>
+<ul>
+<li>用户先被导向某个地域或机房</li>
+<li>进入机房后，再由入口网关分发到接入集群</li>
+<li>接入层继续调用内部服务</li>
+<li>内部服务再调用下游服务</li>
+</ul>
+<p>也就是说，“应该把请求发给谁”这个问题，会在系统中反复出现。<br>既然如此，负载均衡自然也就不再只是入口处那一个独立设备的职责。</p>
+<p>在更大的系统里，流量分发通常会拆成几层。</p>
+<h3 id="DNS-负载均衡"><a href="#DNS-负载均衡" class="headerlink" title="DNS 负载均衡"></a>DNS 负载均衡</h3><p>最外层往往是 DNS。<br>它并不直接决定某个请求落到哪台应用机器，而是先决定用户应该被导向哪个地域、哪个机房，或者哪一个大入口。</p>
+<p>用户先访问域名，DNS 服务器（分布式集群）返回不同机房的入口地址。例如：</p>
+<ul>
+<li>华东用户导向上海机房</li>
+<li>华北用户导向北京机房</li>
+<li>海外用户导向新加坡入口</li>
+</ul>
+<p>这一层解决的是更粗粒度的流量分配问题。<br>它分的是“先去哪里”，而不是“最终进哪台应用实例”。</p>
+<h3 id="入口网关负载均衡"><a href="#入口网关负载均衡" class="headerlink" title="入口网关负载均衡"></a>入口网关负载均衡</h3><p>用户到达某个地域或机房之后，通常还要再经过入口网关层。<br>这时候才进入大家最熟悉的负载均衡场景：在一组接入节点或网关节点之间分配流量。</p>
+<p>这一层更关心的是：</p>
+<ul>
+<li>哪个接入节点健康可用</li>
+<li>哪个节点当前更空闲</li>
+<li>新连接应该落到哪里</li>
+</ul>
+<p>这一层通常会用到前面介绍过的轮询、最少连接、加权最少连接等算法。</p>
+<h3 id="服务间负载均衡"><a href="#服务间负载均衡" class="headerlink" title="服务间负载均衡"></a>服务间负载均衡</h3><p>在微服务系统中，请求进入网关之后并不会立刻结束。<br>一个服务往往还要继续调用其他服务。</p>
+<p>例如：</p>
+<ul>
+<li>订单服务调用库存服务</li>
+<li>库存服务调用支付服务</li>
+<li>支付服务调用风控服务</li>
+</ul>
+<p>这时，负载均衡就不再只发生在最外层入口，而是开始进入系统内部。每一次服务调用，都需要在多个实例中选择一个目标节点。</p>
+<p>从这个角度看，服务间调用本身也存在一个“应该把请求发给谁”的问题。<br>只是这里要分发的，不再是用户到接入层的流量，而是系统内部一层又一层的服务请求。</p>
+<p>在这一层里，负载均衡有不同实现方式。</p>
+<p>一种方式是，调用请求先经过一个中心代理，再由代理把请求转发给某个服务实例。<br>另一种方式则更常见于微服务体系：调用方先通过服务发现拿到实例列表，再由自己在本地决定把请求发给哪个实例。这个做法通常被称为<strong>客户端负载均衡</strong>。</p>
+<p>这里的“客户端”并不是浏览器或手机，而是发起调用的服务本身。比如订单服务，就是库存服务的客户端。</p>
+<p>这样做的好处在于：</p>
+<ul>
+<li>少经过一次中间转发</li>
+<li>减少中心代理的压力</li>
+<li>更适合实例频繁变化的场景</li>
+</ul>
+<p>也正因为如此，到了系统内部这一层，负载均衡往往已经不再表现为一个独立的前置设备。它可能存在于调用方的 SDK 中，存在于客户端库中，也可能由 Sidecar 代理或者 Service Mesh 的数据平面来完成。</p>
+<p>换句话说，系统越往后走，负载均衡越不像一个放在前面的“盒子”，而更像一种分散在各处的流量分发能力。</p>
+<h2 id="分布式负载均衡解决的问题"><a href="#分布式负载均衡解决的问题" class="headerlink" title="分布式负载均衡解决的问题"></a>分布式负载均衡解决的问题</h2><p>因此，所谓“从单机负载均衡到分层分布式负载均衡”，并不是指前一种错误、后一种先进，而是指随着系统规模和层次增长，负载均衡这件事本身发生了变化。</p>
+<p>它当然解决了“单个 LB 容易成为瓶颈”的问题，但更重要的是，它适应了这样一种事实：<br><strong>流量分发不再只发生在入口，而是发生在系统的多个层次。</strong></p>
+<p>比如：</p>
+<ul>
+<li>用户访问时，要先决定进入哪个地域、哪个机房</li>
+<li>进入机房后，还要决定落到哪个入口节点</li>
+<li>服务调用服务时，还要继续决定请求发给哪个实例</li>
+</ul>
+<p>而且，这些分发动作未必都由某一个独立设备完成。<br>有些发生在 DNS 层，有些发生在网关层，有些则发生在服务调用方、本地代理或者 Mesh 之中。</p>
+<p>所以更准确地说，分布式负载均衡不是简单地“把一个 LB 变成很多个 LB”，而是<strong>把流量分发的职责拆散，放到系统不同层次分别完成。</strong></p>
+<h1 id="软件负载均衡的误区"><a href="#软件负载均衡的误区" class="headerlink" title="软件负载均衡的误区"></a>软件负载均衡的误区</h1><p>最后简单说几个很常见的问题。</p>
+<h2 id="以为算法决定一切"><a href="#以为算法决定一切" class="headerlink" title="以为算法决定一切"></a>以为算法决定一切</h2><p>实际上，算法只是负载均衡的一部分。<br>健康检查、超时、重试、状态维护、节点上下线策略同样重要。</p>
+<h2 id="以为平均就是最优"><a href="#以为平均就是最优" class="headerlink" title="以为平均就是最优"></a>以为平均就是最优</h2><p>平均分配并不总是最合理的。在很多场景里，真正重要的是：</p>
+<ul>
+<li>避免热点</li>
+<li>控制延迟</li>
+<li>保持稳定</li>
+<li>降低抖动</li>
+</ul>
+<h2 id="过度依赖会话保持"><a href="#过度依赖会话保持" class="headerlink" title="过度依赖会话保持"></a>过度依赖会话保持</h2><p>会话保持有时是必要的，但也会降低流量调度自由度，容易引入热点。<br>现代系统通常更倾向于把状态外置，而不是强依赖粘性路由。</p>
+<h2 id="忽略重试的副作用"><a href="#忽略重试的副作用" class="headerlink" title="忽略重试的副作用"></a>忽略重试的副作用</h2><p>重试虽然能提高成功率，但也可能在故障场景下放大流量，导致系统雪崩。<br>所以重试必须谨慎配置。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/221c331ea1c6/">http://ecamt35.github.io/221c331ea1c6/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">分布式系统</a><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">计算机网络</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/f6b1ecf8ea6e/" title="Java虚拟线程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Java虚拟线程</div></div><div class="info-2"><div class="info-item-1">Java虚拟线程</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/fa2bcf65db26/" title="CAP与分布式系统"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-08</div><div class="info-item-2">CAP与分布式系统</div></div><div class="info-2"><div class="info-item-1">CAP理论与理解</div></div></div></a><a class="pagination-related" href="/d451d62f56e3/" title="分布式IM设计的胡思乱想"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-05</div><div class="info-item-2">分布式IM设计的胡思乱想</div></div><div class="info-2"><div class="info-item-1">关于IM设计的一些思考</div></div></div></a><a class="pagination-related" href="/3d36dd04b30a/" title="分布式下的WebSocket"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-31</div><div class="info-item-2">分布式下的WebSocket</div></div><div class="info-2"><div class="info-item-1">分布式下的WebSocket问题</div></div></div></a><a class="pagination-related" href="/15c78de5d315/" title="Raft阅读随记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-02</div><div class="info-item-2">Raft阅读随记</div></div><div class="info-2"><div class="info-item-1">记录阅读Raft时的一些疑问及思考</div></div></div></a><a class="pagination-related" href="/9a0e6259ac11/" title="浅读Raft算法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-02</div><div class="info-item-2">浅读Raft算法</div></div><div class="info-2"><div class="info-item-1">截取融合USENIX ATC'14版本与作者博士论文版本的奇美拉，前部分主要以USENIX ATC'14为主+个人修改，后部分以作者博士论文版本的机翻为主。章节引用、图片序号没更正，看上去也许比较乱...</div></div></div></a><a class="pagination-related" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-08</div><div class="info-item-2">Linux虚拟网络化与隔离技术</div></div><div class="info-2"><div class="info-item-1">Linux虚拟网络化与隔离技术</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">21</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">软件负载均衡工作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%EF%BC%88L4%EF%BC%89"><span class="toc-number">1.1.</span> <span class="toc-text">四层负载均衡（L4）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%EF%BC%88L7%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">七层负载均衡（L7）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">负载均衡算法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AE%E8%AF%A2%EF%BC%88Round-Robin%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">轮询（Round Robin）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E6%9D%83%E8%BD%AE%E8%AF%A2%EF%BC%88Weighted-Round-Robin%EF%BC%89"><span class="toc-number">2.2.</span> <span class="toc-text">加权轮询（Weighted Round Robin）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9A%8F%E6%9C%BA%EF%BC%88Random%EF%BC%89"><span class="toc-number">2.3.</span> <span class="toc-text">随机（Random）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%A4%E6%AC%A1%E9%9A%8F%E6%9C%BA%E9%80%89%E6%8B%A9%EF%BC%88Power-of-Two-Choices%EF%BC%89"><span class="toc-number">2.4.</span> <span class="toc-text">两次随机选择（Power of Two Choices）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%B0%91%E8%BF%9E%E6%8E%A5%EF%BC%88Least-Connections%EF%BC%89"><span class="toc-number">2.5.</span> <span class="toc-text">最少连接（Least Connections）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A0%E6%9D%83%E6%9C%80%E5%B0%91%E8%BF%9E%E6%8E%A5%EF%BC%88Weighted-Least-Connections%EF%BC%89"><span class="toc-number">2.6.</span> <span class="toc-text">加权最少连接（Weighted Least Connections）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E7%9F%AD%E5%93%8D%E5%BA%94%E6%97%B6%E9%97%B4-%E6%9C%80%E4%BD%8E%E5%BB%B6%E8%BF%9F%EF%BC%88Least-Response-Time%EF%BC%89"><span class="toc-number">2.7.</span> <span class="toc-text">最短响应时间 &#x2F; 最低延迟（Least Response Time）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E5%93%88%E5%B8%8C%E7%9A%84%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%EF%BC%88Hash-Based%EF%BC%89"><span class="toc-number">2.8.</span> <span class="toc-text">基于哈希的负载均衡（Hash-Based）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#IP-Hash"><span class="toc-number">2.8.1.</span> <span class="toc-text">IP Hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#URL-Hash"><span class="toc-number">2.8.2.</span> <span class="toc-text">URL Hash</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Header-Cookie-User-ID-Hash"><span class="toc-number">2.8.3.</span> <span class="toc-text">Header &#x2F; Cookie &#x2F; User ID Hash</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%EF%BC%88Consistent-Hashing%EF%BC%89"><span class="toc-number">2.9.</span> <span class="toc-text">一致性哈希（Consistent Hashing）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%B0%91%E8%AF%B7%E6%B1%82-%E6%9C%80%E7%9F%AD%E9%98%9F%E5%88%97%EF%BC%88Least-Requests-Shortest-Queue%EF%BC%89"><span class="toc-number">2.10.</span> <span class="toc-text">最少请求 &#x2F; 最短队列（Least Requests &#x2F; Shortest Queue）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E7%9A%84%E5%9C%BA%E6%99%AF%E6%80%BB%E7%BB%93"><span class="toc-number">3.</span> <span class="toc-text">算法的场景总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9C%A8%E5%B7%A5%E7%A8%8B%E4%B8%8A%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">4.</span> <span class="toc-text">软件负载均衡在工程上的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%8E%E7%AB%AF%E8%8A%82%E7%82%B9%E7%AE%A1%E7%90%86"><span class="toc-number">4.1.</span> <span class="toc-text">后端节点管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%81%A5%E5%BA%B7%E6%A3%80%E6%9F%A5"><span class="toc-number">4.2.</span> <span class="toc-text">健康检查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9E%E6%8E%A5%E5%A4%84%E7%90%86%E6%A8%A1%E5%9E%8B"><span class="toc-number">4.3.</span> <span class="toc-text">连接处理模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AC%E5%8F%91%E6%A8%A1%E5%BC%8F"><span class="toc-number">4.4.</span> <span class="toc-text">转发模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="toc-number">4.4.1.</span> <span class="toc-text">反向代理模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#NAT-DR-TUN-%E7%AD%89%E5%86%85%E6%A0%B8%E8%BD%AC%E5%8F%91%E6%A8%A1%E5%BC%8F"><span class="toc-number">4.4.2.</span> <span class="toc-text">NAT &#x2F; DR &#x2F; TUN 等内核转发模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D%E4%BF%9D%E6%8C%81%EF%BC%88Session-Persistence%EF%BC%89"><span class="toc-number">4.5.</span> <span class="toc-text">会话保持（Session Persistence）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E6%9D%83%E9%87%8D%E4%B8%8E%E6%85%A2%E5%90%AF%E5%8A%A8%EF%BC%88Slow-Start%EF%BC%89"><span class="toc-number">4.6.</span> <span class="toc-text">动态权重与慢启动（Slow Start）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%9E%E6%8E%A5%E6%91%98%E9%99%A4%E4%B8%8E%E4%BC%98%E9%9B%85%E4%B8%8B%E7%BA%BF%EF%BC%88Draining%EF%BC%89"><span class="toc-number">4.7.</span> <span class="toc-text">连接摘除与优雅下线（Draining）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E8%AF%95%E3%80%81%E8%B6%85%E6%97%B6%E3%80%81%E7%86%94%E6%96%AD"><span class="toc-number">4.8.</span> <span class="toc-text">重试、超时、熔断</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%87%A0%E7%A7%8D%E5%85%B8%E5%9E%8B%E8%BD%AF%E4%BB%B6%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%99%A8%E7%9A%84%E9%A3%8E%E6%A0%BC%E5%B7%AE%E5%BC%82"><span class="toc-number">5.</span> <span class="toc-text">几种典型软件负载均衡器的风格差异</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E5%B1%82%E5%88%86%E5%B8%83%E5%BC%8F%E6%B5%81%E9%87%8F%E8%B0%83%E5%BA%A6"><span class="toc-number">6.</span> <span class="toc-text">分层分布式流量调度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%9A%84%E5%88%86%E5%B1%82"><span class="toc-number">6.1.</span> <span class="toc-text">负载均衡的分层</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DNS-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">6.1.1.</span> <span class="toc-text">DNS 负载均衡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%A5%E5%8F%A3%E7%BD%91%E5%85%B3%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">6.1.2.</span> <span class="toc-text">入口网关负载均衡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E9%97%B4%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1"><span class="toc-number">6.1.3.</span> <span class="toc-text">服务间负载均衡</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">6.2.</span> <span class="toc-text">分布式负载均衡解决的问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BD%AF%E4%BB%B6%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%9A%84%E8%AF%AF%E5%8C%BA"><span class="toc-number">7.</span> <span class="toc-text">软件负载均衡的误区</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A5%E4%B8%BA%E7%AE%97%E6%B3%95%E5%86%B3%E5%AE%9A%E4%B8%80%E5%88%87"><span class="toc-number">7.1.</span> <span class="toc-text">以为算法决定一切</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A5%E4%B8%BA%E5%B9%B3%E5%9D%87%E5%B0%B1%E6%98%AF%E6%9C%80%E4%BC%98"><span class="toc-number">7.2.</span> <span class="toc-text">以为平均就是最优</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%87%E5%BA%A6%E4%BE%9D%E8%B5%96%E4%BC%9A%E8%AF%9D%E4%BF%9D%E6%8C%81"><span class="toc-number">7.3.</span> <span class="toc-text">过度依赖会话保持</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%BD%E7%95%A5%E9%87%8D%E8%AF%95%E7%9A%84%E5%89%AF%E4%BD%9C%E7%94%A8"><span class="toc-number">7.4.</span> <span class="toc-text">忽略重试的副作用</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/221c331ea1c6/" title="负载均衡">负载均衡</a><time datetime="2026-03-21T16:00:00.000Z" title="发表于 2026-03-22 00:00:00">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/086023a35dd3/" title="Linux虚拟网络化与隔离技术">Linux虚拟网络化与隔离技术</a><time datetime="2026-02-07T16:00:00.000Z" title="发表于 2026-02-08 00:00:00">2026-02-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/15c78de5d315/" title="Raft阅读随记">Raft阅读随记</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9a0e6259ac11/" title="浅读Raft算法">浅读Raft算法</a><time datetime="2026-02-02T03:30:00.000Z" title="发表于 2026-02-02 11:30:00">2026-02-02</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
