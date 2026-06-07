@@ -5,7 +5,7 @@ description: Archlinux日常维护命令速查
 categories: 
 - GNU/Linux
 tags:
-- Archlinux
+- ArchLinux
 ---
 
 # 包管理
