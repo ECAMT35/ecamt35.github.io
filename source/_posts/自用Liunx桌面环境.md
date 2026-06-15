@@ -66,6 +66,7 @@ bar: [dam（自定义修改）](https://github.com/ECAMT35/dam)
 桌面通知：fnott
 串流：sunshine + moonlight(client)
 XDG 桌面门户: xdg-desktop-portal-gtk, xdg-desktop-portal-wlr
+图片压缩：oxipng + jpegoptim + pngquant + webp tools
 
 文档编辑: LibreOffice, Obsidian
 画板、图片编辑: Krita
