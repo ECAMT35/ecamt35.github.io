@@ -1,0 +1,212 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Wine/Proton | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="使用Wine&#x2F;Proton运行.exe程序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Wine&#x2F;Proton">
+<meta property="og:url" content="http://ecamt35.github.io/07e3b463471c/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="使用Wine&#x2F;Proton运行.exe程序">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2026-06-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-06-06T16:00:00.000Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="Wine&#x2F;Proton">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Wine/Proton",
+  "url": "http://ecamt35.github.io/07e3b463471c/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2026-06-06T16:00:00.000Z",
+  "dateModified": "2026-06-06T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/07e3b463471c/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Wine/Proton',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">Wine/Proton</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Wine/Proton</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-06-06T16:00:00.000Z" title="发表于 2026-06-07 00:00:00">2026-06-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-06-06T16:00:00.000Z" title="更新于 2026-06-07 00:00:00">2026-06-07</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/GNU-Linux/">GNU/Linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">781</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-06-07 00:00:00&quot;}" hidden></div><p>参考资料：<br><a target="_blank" rel="noopener" href="https://wiki.archlinuxcn.org/wiki/Wine#">https://wiki.archlinuxcn.org/wiki/Wine#</a><br><a target="_blank" rel="noopener" href="https://www.protondb.com/">https://www.protondb.com/</a></p>
+<h1 id="自用方案"><a href="#自用方案" class="headerlink" title="自用方案"></a>自用方案</h1><p>使用 bottles&#x2F;lutris 作为前端启动器，使用 <a target="_blank" rel="noopener" href="https://github.com/Vysp3r/ProtonPlus">ProtonPlus</a> 管理容器版本；<br>日常使用 Wine-staging&#x2F;<a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/proton-ge-custom-bin">proton-ge-custom-bin</a>&#x2F;<a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/dwproton-bin">DW-Prototn</a> 作为容器。</p>
+<p>推荐安装的函数库： </p>
+<ul>
+<li>d3d11 </li>
+<li>d3d9</li>
+<li>devenum</li>
+<li>gdiplus</li>
+<li>quartz</li>
+<li>wmp11</li>
+<li>directshow</li>
+<li>lavfilters</li>
+</ul>
+<p>部分应用可能会需要其他的依赖（参考 <a target="_blank" rel="noopener" href="https://gitlab.winehq.org/wine/wine/-/wikis/Building-Wine#satisfying-build-dependencies">WineHQ 页面</a>），可以一劳永逸全部装完：</p>
+<ul>
+<li>TLS 的 32 位支持可以安装 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=lib32-gnutls">lib32-gnutls</a></li>
+<li>手柄和游戏杆的 32 位支持可以安装 <a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/lib32-sdl2/">lib32-sdl2</a></li>
+<li>媒体播放的 32 位支持可以根据需求安装 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=lib32-gst-plugins-base">lib32-gst-plugins-base</a>、 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=lib32-gst-plugins-good">lib32-gst-plugins-good</a>、<a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/lib32-gst-plugins-bad/">lib32-gst-plugins-bad</a>、<a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/lib32-gst-plugins-ugly/">lib32-gst-plugins-ugly</a> 和 <a target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/lib32-gst-libav/">lib32-gst-libav</a></li>
+<li>对于 <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/NTLM" title="wikipedia:NTLM">NTLM</a> 验证可以安装 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=samba">samba</a></li>
+</ul>
+<p>运行依赖于 .NET 的应用程序需安装：wine-mono<br>运行依赖于 Internet Explorer 的应用程序 ：wine-gecko<br>这两个可以在 bottles&#x2F;lutris 里面进行下载，一般可以不行进系统级的安装</p>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="字体"><a href="#字体" class="headerlink" title="字体"></a>字体</h2><p>建议安装 window 的字体到 wine 盘解决，只需要把 window 字体文件夹 <code>Font</code> 覆盖到 wine 盘的 c 驱动盘的 <code>window/Font</code> 即可。<br><del>其实就是把 <code>.ttf</code> 文件复制到 <code>window/Font</code> 目录下，用一个软链接就行</del></p>
+<h2 id="运行失败"><a href="#运行失败" class="headerlink" title="运行失败"></a>运行失败</h2><p>运行不了的程序，如果找不出原因去修，那就尝试使用其他版本的 Wine（这就是我推荐使用 ProtonPlus 的原因，别只盯着原版 Wine 使用，这会让你轻松很多）</p>
+<p>可以到 protonDB 看看有没有运行成功的例子，借鉴下方案。</p>
+<p>如果还是不行只能启动 KVM 了</p>
+<h2 id="窗口缩放"><a href="#窗口缩放" class="headerlink" title="窗口缩放"></a>窗口缩放</h2><p>Wine&#x2F;Proton 默认使用 96 DPI，在高分辨率屏幕上可能导致程序窗口和字体过小。可以根据显示器 DPI 适当提高 Wine 的 DPI 设置，使程序以更大的 UI 尺寸进行渲染。<br>gamescope 也可以用于全屏显示和分辨率缩放，但如果将较低分辨率的画面放大到高分辨率输出，文字和 UI 可能会变得模糊，因此优先调整 DPI 或使用程序自身的高 DPI 支持。</p>
+<h1 id="提示与技巧"><a href="#提示与技巧" class="headerlink" title="提示与技巧"></a>提示与技巧</h1><h2 id="Wineconsole"><a href="#Wineconsole" class="headerlink" title="Wineconsole"></a>Wineconsole</h2><p>通常情况下，你可能需要运行.exe 来修补游戏文件，例如一个老游戏的宽屏 mod，通过 Wine 正常运行.exe 可能不会产生任何效果。在这种情况下，你可以打开一个终端，运行以下命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ wineconsole cmd</span><br></pre></td></tr></table></figure>
+
+<p>然后转到该目录，从那里运行 <em>.exe</em> 文件。</p>
+<h2 id="游戏内显示帧数"><a href="#游戏内显示帧数" class="headerlink" title="游戏内显示帧数"></a>游戏内显示帧数</h2><p>Wine 有一个内置的 FPS 检测器，在环境变量 <code>WINEDEBUG=fps</code> 设定的情况下，它会运行在所有图形程序上。这将会输出帧率到标准输出。你可以显示帧率到屏幕最上面通过 <a target="_blank" rel="noopener" href="https://archlinux.org/packages/?name=xosd">xosd</a> 包 包中的 <code>osd_cat</code>。<a target="_blank" rel="noopener" href="https://gist.github.com/anonymous/844aefd70bb50bf72b35">winefps.sh</a> 为它的帮助脚本。</p>
+<h2 id="Vulkan"><a href="#Vulkan" class="headerlink" title="Vulkan"></a>Vulkan</h2><p>默认的 wine Vulkan ICD 加载器在大多数程序中都工作地很好，但是不支持高级特性，例如 Vulkan 层。为使用这些特性，你需要安装官方的 Vulkan SDK，见原始的 Vulkan 补丁作者的 <a target="_blank" rel="noopener" href="https://github.com/roderickc/wine-vulkan">GitHub page</a> 的第二到四步。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/07e3b463471c/">http://ecamt35.github.io/07e3b463471c/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Wine-Proton/">Wine/Proton</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/221c331ea1c6/" title="负载均衡"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">负载均衡</div></div><div class="info-2"><div class="info-item-1">负载均衡</div></div></div></a><a class="pagination-related" href="/8beea043f7a0/" title="自用Linux桌面环境"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">自用Linux桌面环境</div></div><div class="info-2"><div class="info-item-1">My dotfiles : https://github.com/ECAMT35/dotfiles.git Arch主文件系统：ext4分区：&#x2F;boot&#x3D;1G, &#x2F;&#x3D;128G, SWAP&#x3D;32G, &#x2F;home&#x3D;remaining, total&#x3D;1Tboot：GRUB 命令解释器: bash文本编辑器: neovim网络管理: NetworkManager蓝牙管理: blueman硬盘检测: smartmontools监控: btop笔记本电源管理: TLP固件更新：fwupd 桌面环境窗口管理器：river...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%87%AA%E7%94%A8%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text">自用方案</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">常见问题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E4%BD%93"><span class="toc-number">2.1.</span> <span class="toc-text">字体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E5%A4%B1%E8%B4%A5"><span class="toc-number">2.2.</span> <span class="toc-text">运行失败</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E7%BC%A9%E6%94%BE"><span class="toc-number">2.3.</span> <span class="toc-text">窗口缩放</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8F%90%E7%A4%BA%E4%B8%8E%E6%8A%80%E5%B7%A7"><span class="toc-number">3.</span> <span class="toc-text">提示与技巧</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Wineconsole"><span class="toc-number">3.1.</span> <span class="toc-text">Wineconsole</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B8%B8%E6%88%8F%E5%86%85%E6%98%BE%E7%A4%BA%E5%B8%A7%E6%95%B0"><span class="toc-number">3.2.</span> <span class="toc-text">游戏内显示帧数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Vulkan"><span class="toc-number">3.3.</span> <span class="toc-text">Vulkan</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9b46cddec5d5/" title="KVM">KVM</a><time datetime="2026-06-14T16:00:00.000Z" title="发表于 2026-06-15 00:00:00">2026-06-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/07e3b463471c/" title="Wine/Proton">Wine/Proton</a><time datetime="2026-06-06T16:00:00.000Z" title="发表于 2026-06-07 00:00:00">2026-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/8beea043f7a0/" title="自用Linux桌面环境">自用Linux桌面环境</a><time datetime="2026-06-06T16:00:00.000Z" title="发表于 2026-06-07 00:00:00">2026-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/221c331ea1c6/" title="负载均衡">负载均衡</a><time datetime="2026-03-21T16:00:00.000Z" title="发表于 2026-03-22 00:00:00">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>

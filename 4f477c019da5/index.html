@@ -1,0 +1,381 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>分布式IM设计 | ECAMT35 的地下室</title><meta name="author" content="ECAMT35"><meta name="copyright" content="ECAMT35"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="关于IM设计的一些思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式IM设计">
+<meta property="og:url" content="http://ecamt35.github.io/4f477c019da5/index.html">
+<meta property="og:site_name" content="ECAMT35 的地下室">
+<meta property="og:description" content="关于IM设计的一些思考">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://ecamt35.github.io/image/avatar.png">
+<meta property="article:published_time" content="2025-10-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-04-30T16:00:00.000Z">
+<meta property="article:author" content="ECAMT35">
+<meta property="article:tag" content="分布式系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ecamt35.github.io/image/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "分布式IM设计",
+  "url": "http://ecamt35.github.io/4f477c019da5/",
+  "image": "http://ecamt35.github.io/image/avatar.png",
+  "datePublished": "2025-10-04T16:00:00.000Z",
+  "dateModified": "2026-04-30T16:00:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ECAMT35",
+      "url": "http://ecamt35.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/"><link rel="canonical" href="http://ecamt35.github.io/4f477c019da5/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const isNight = hour <= 6 || hour >= 18
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', () => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '分布式IM设计',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/image/default_top_img.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ECAMT35 的地下室</span></a><a class="nav-page-title" href="/"><span class="site-name">分布式IM设计</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">分布式IM设计</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-04T16:00:00.000Z" title="发表于 2025-10-05 00:00:00">2025-10-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-04-30T16:00:00.000Z" title="更新于 2026-05-01 00:00:00">2026-05-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E6%9C%AF%E7%90%86%E8%AE%BA/">技术理论</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">5.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>15分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div id="post-outdate-notice" data="{&quot;limitDay&quot;:90,&quot;messagePrev&quot;:&quot;It has been&quot;,&quot;messageNext&quot;:&quot;days since the last update, the content of the article may be outdated.&quot;,&quot;postUpdate&quot;:&quot;2026-05-01 00:00:00&quot;}" hidden></div><p>参考：</p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1936475">IM消息机制（一）：保证在线实时消息的可靠投递</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_21561833/article/details/135681086">分布式websocket即时通信(IM)系统保证消息可靠性【第八期】</a><br><a target="_blank" rel="noopener" href="https://blog.yueban.site/2021/02/09/Telegram%20%E5%AE%89%E5%85%A8%E6%96%B9%E6%A1%88%E8%A7%A3%E6%9E%90%20-%20%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%88%B0%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84%E5%8A%A0%E5%AF%86/#Authorization-Key-auth-key">Telegram 安全方案解析 - 客户端到服务端的加密</a></p>
+<h1 id="分布式-WebSocket"><a href="#分布式-WebSocket" class="headerlink" title="分布式 WebSocket"></a>分布式 WebSocket</h1><p>IM 系统对时效要求比较高，轮询方案虽然能实现消息获取，但会把实时性建立在大量重复请求上，代价并不划算。WebSocket 在握手之后保持长连接，更适合这种服务端主动推送的场景。</p>
+<p>这里选择 Netty 而不是 Tomcat，主要出于考虑：</p>
+<ol>
+<li>长连接接入层可以单独控制，线程模型更清晰</li>
+<li>WebSocket 接入、业务处理、跨节点转发更容易拆开</li>
+</ol>
+<p>另外，Netty 的 Reactor 线程模型天然将 I&#x2F;O 处理与业务线程分离，比 Tomcat 的 Servlet 线程模型更适合大量 WebSocket 长连接场景。若配合虚拟线程，业务处理部分的并发吞吐还能进一步提升。</p>
+<p>分布式 WebSocket 的相关文章我也有介绍，这里省略点吧。</p>
+<h1 id="接入架构"><a href="#接入架构" class="headerlink" title="接入架构"></a>接入架构</h1><p>整体的架构可能是这样：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Client  </span><br><span class="line">  -&gt; Gateway  </span><br><span class="line">  -&gt; Netty WebSocket 节点  </span><br><span class="line">  -&gt; Redis 路由  </span><br><span class="line">  -&gt; MQ 跨节点转发  </span><br><span class="line">  -&gt; MySQL 持久化</span><br></pre></td></tr></table></figure>
+
+<p>接入节点时尽量只做轻量工作，例如：</p>
+<ul>
+<li>连接建立</li>
+<li>身份认证</li>
+<li>心跳处理</li>
+<li>连接上下文绑定</li>
+<li>基础报文编解码</li>
+</ul>
+<p>数据库访问、关系校验、消息写入和跨节点转发，不适合放在 EventLoop 线程里直接完成，可以选择线程池或者虚拟线程。</p>
+<h1 id="Redis-路由模型"><a href="#Redis-路由模型" class="headerlink" title="Redis 路由模型"></a>Redis 路由模型</h1><p>分布式场景下，服务端必须知道某个用户、某台设备当前挂在哪个节点上。<br>因此，Redis 中保存的就不该只是一个“在线标志”，而应当是<strong>可用于路由判断的连接信息</strong>。</p>
+<p>当前实现是基于 <code>sessionId</code> 管连接，所以这部分更贴切的表达应该是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ws:user:devices:&#123;userId&#125; -&gt; Set(deviceId)</span><br><span class="line"></span><br><span class="line">ws:route:&#123;userId&#125;:&#123;deviceId&#125; -&gt; &#123;</span><br><span class="line">  nodeId,</span><br><span class="line">  sessionId</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的 <code>sessionId</code> 是当前连接的唯一标识。<br>同一设备重新登录时，会生成新的 <code>sessionId</code>，并覆盖 Redis 中对应的路由记录。</p>
+<h2 id="sessionId-的作用"><a href="#sessionId-的作用" class="headerlink" title="sessionId 的作用"></a>sessionId 的作用</h2><p>如果系统支持多设备在线，同时还要处理同一设备重复登录的情况，<code>sessionId</code> 就很有用。</p>
+<p>原因在于，下面几步不是原子完成的：</p>
+<ul>
+<li>新连接建立</li>
+<li>Redis 路由覆盖</li>
+<li>旧节点收到下线通知</li>
+<li>旧连接被清理</li>
+</ul>
+<p>若旧节点只按 <code>userId + deviceId</code> 粗略判断，很容易在通知迟到时误伤新连接。<br>而有了 <code>sessionId</code> 之后，旧节点在关闭连接前，只需要先比较：</p>
+<ul>
+<li>本地连接的 <code>sessionId</code></li>
+<li>Redis 当前保存的 <code>sessionId</code></li>
+</ul>
+<p>只有两者仍然对应同一条旧连接，才执行关闭。这样处理，跨节点顶号会更加合理。</p>
+<h2 id="路由覆盖与清理"><a href="#路由覆盖与清理" class="headerlink" title="路由覆盖与清理"></a>路由覆盖与清理</h2><p>如果同一设备重复登录，新连接会生成新的 <code>sessionId</code>，并覆盖旧路由。<br>旧节点收到下线通知后，不应该只按 <code>userId</code> 或 <code>deviceId</code> 去清理连接，而应当带上目标 <code>sessionId</code> 一起判断。</p>
+<p>更好一点的处理方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">if local.sessionId == targetSessionId:  </span><br><span class="line">    close()</span><br></pre></td></tr></table></figure>
+
+<p>这样可以避免迟到的通知误伤后建立的新连接。</p>
+<h1 id="消息加密"><a href="#消息加密" class="headerlink" title="消息加密"></a>消息加密</h1><p>单聊场景下，可以使用 <strong>X3DH</strong> 完成初始密钥协商进行端对端加密。<br>这里需要特别说明：X3DH 更适合放在<strong>会话建立阶段</strong>，而不是每条消息发送时都重新执行一次。</p>
+<p>比较常见的做法是：</p>
+<ul>
+<li>用户长期持有身份密钥 <code>IK</code></li>
+<li>接收方在服务端发布预密钥包，例如 <code>IK</code>、<code>SPK</code>、<code>OPK</code></li>
+<li>发送方首次发起会话时临时生成 <code>EK</code></li>
+<li>双方基于这些公钥材料协商出初始共享密钥</li>
+</ul>
+<p>服务端保存的是<strong>公钥材料</strong>，不是私钥。<br>后续逐条消息的加密，通常应交给会话密钥链继续推进，而不是反复重新走 X3DH。</p>
+<p>群聊的场景使用对称加密也许是更好的选择。</p>
+<h1 id="可靠投递"><a href="#可靠投递" class="headerlink" title="可靠投递"></a>可靠投递</h1><h2 id="不可靠的可能性"><a href="#不可靠的可能性" class="headerlink" title="不可靠的可能性"></a>不可靠的可能性</h2><p>TCP 解决的是传输层的字节流可靠性，但 IM 系统关心的是<strong>业务层的消息可靠性</strong>。</p>
+<p>也就是说，TCP 可以保证数据到达对端 TCP 层，却不能保证：</p>
+<ul>
+<li>接收端应用已成功处理该消息</li>
+<li>消息已进入本地存储</li>
+<li>客户端重连后还能继续恢复这条消息</li>
+</ul>
+<p>所以，IM 系统仍然需要自己的业务确认机制，如经典的六报文确认机制。</p>
+<h2 id="六报文设计"><a href="#六报文设计" class="headerlink" title="六报文设计"></a>六报文设计</h2><p>IM 系统的六报文设计是<strong>消息可靠投递的核心机制</strong>。</p>
+<p>报文分为三种：</p>
+<ol>
+<li>请求报文（request，后简称为为 R）</li>
+<li>应答报文（acknowledge，后简称为 A）</li>
+<li>通知报文（notify，后简称为 N）</li>
+</ol>
+<p><strong>msg:R&#x2F;A&#x2F;N</strong>：确保消息从发送方到接收方的可靠性。<br><strong>ack:R&#x2F;A&#x2F;N</strong>：确保接收方已读消息，并通知发送方。</p>
+<p>流程</p>
+<ol>
+<li><strong>发送请求（msg:R）</strong>- 客户端 A 发送消息到服务器（IM Server）。</li>
+<li><strong>发送确认（msg:A）</strong>- IM Server 确认消息已接收，返回 ACK 给客户端 A。</li>
+<li><strong>消息通知（msg:N）</strong>- IM Server 将消息推送给客户端 B（若在线）。</li>
+<li><strong>客户端 B 确认请求（ack:R）</strong>- 客户端 B 向 IM Server 发送 ACK 确认请求收到消息。</li>
+<li><strong>服务端确认（ack:A）</strong>- IM Server 确认客户端 B 的 ACK。</li>
+<li><strong>发送方通知（ack:N）</strong>- IM Server 通知客户端 A 消息已送达客户端 B。</li>
+</ol>
+<p>在实践中，当用户客户端设备均不在线时，msg 和 ack 的 N 采用客户端 pull 来完成，以替代服务端的推送队列。</p>
+<p>另外，“到达对端”这个通知一般上说作用其实并没有这么大，像是 TG、飞书之类的几乎没用到这个报文完成一些功能，所以可以考虑按分层来精简降低复杂度：</p>
+<ul>
+<li>基础可靠：msg:R + msg:A</li>
+<li>投递确认：msg:N（可选）</li>
+<li>已读：ack:R&#x2F;A&#x2F;N</li>
+</ul>
+<h2 id="发送端幂等"><a href="#发送端幂等" class="headerlink" title="发送端幂等"></a>发送端幂等</h2><p>发送端应为每条消息带一个本地生成的唯一标识，例如 <code>clientMsgId</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;  </span><br><span class="line">  &quot;clientMsgId&quot;: &quot;2f88d6d4-7c30-4c52-9e65-1d0b2a1c5a12&quot;,  </span><br><span class="line">  &quot;conversationId&quot;: 10001,  </span><br><span class="line">  &quot;senderId&quot;: 20001,  </span><br><span class="line">  &quot;content&quot;: &quot;hello&quot;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>服务端收到后，先根据 <code>clientMsgId</code> 做幂等判断：</p>
+<ul>
+<li>已处理：直接返回已有结果</li>
+<li>未处理：继续分配消息 ID、写入数据库、推进状态</li>
+</ul>
+<p>服务端自己的消息主键可以继续使用雪花 ID。<br>这样，本地请求标识和服务端消息标识各司其职，不会混在一起。</p>
+<h2 id="超时与重传"><a href="#超时与重传" class="headerlink" title="超时与重传"></a>超时与重传</h2><p>发送端如果在一段时间内收不到 <code>response</code>，可以重试。<br>比较常见的策略如下：</p>
+<p>首次超时：1s<br>第二次：2s<br>第三次：4s<br>最大重试次数：3</p>
+<p>达到上限后，可以把消息标记为发送失败，并提示用户。<br>真正重要的不是重试时间本身，而是<strong>重试时必须复用同一个 <code>clientMsgId</code></strong>，否则重发会被服务端当成新消息处理。</p>
+<h1 id="多设备与在线状态"><a href="#多设备与在线状态" class="headerlink" title="多设备与在线状态"></a>多设备与在线状态</h1><h2 id="在线判定"><a href="#在线判定" class="headerlink" title="在线判定"></a>在线判定</h2><p>在多设备场景下，设备在线和用户在线不是同一层概念：</p>
+<ul>
+<li><strong>设备在线</strong>：该设备当前存在有效 WebSocket 路由</li>
+<li><strong>用户在线</strong>：该用户至少有一台设备在线</li>
+</ul>
+<p>因此，判断某个用户是否在线，不能只看单条记录，而应当先取出该用户所有设备，再看是否至少存在一条有效路由。</p>
+<h2 id="心跳机制"><a href="#心跳机制" class="headerlink" title="心跳机制"></a>心跳机制</h2><p>设备在线状态可以通过心跳维护。<br>例如：</p>
+<p>心跳间隔：60s<br>过期时间：90s</p>
+<p>这种配置的目的，不是追求毫秒级精确，而是在两件事之间做平衡：</p>
+<ul>
+<li>状态修正不能太慢</li>
+<li>网络抖动不能轻易把设备误判成离线</li>
+</ul>
+<p>可以考虑在每一次接发消息时顺带去更新心跳，减少部分网络 IO。</p>
+<h2 id="在线状态与路由状态"><a href="#在线状态与路由状态" class="headerlink" title="在线状态与路由状态"></a>在线状态与路由状态</h2><p>设备只要完成 WebSocket 注册，并且心跳未过期，就可以视为在线。<br>账号在线则是基于设备在线再向上一层聚合的结果，也就是只要任一设备在线，该用户就视为在线。</p>
+<p>这里不再额外做一套复杂的在线判定结构，直接围绕设备路由和过期时间去判断即可。</p>
+<h1 id="同步模型"><a href="#同步模型" class="headerlink" title="同步模型"></a>同步模型</h1><h2 id="读扩散与写扩散"><a href="#读扩散与写扩散" class="headerlink" title="读扩散与写扩散"></a>读扩散与写扩散</h2><p>群聊同步通常绕不开读扩散和写扩散的取舍。</p>
+<h3 id="写扩散"><a href="#写扩散" class="headerlink" title="写扩散"></a>写扩散</h3><p>写扩散是把一条群消息复制给每个成员的个人收件箱。<br>优点是读取简单，缺点是写入成本高。群越大，写放大越明显。</p>
+<p>如果做成收件箱模型，发送者发出一条消息后，除了在消息表里落一条原始消息，还需要为每个接收者额外写一条关联记录。单聊下这个成本还好，大群里就会比较明显。</p>
+<h3 id="读扩散"><a href="#读扩散" class="headerlink" title="读扩散"></a>读扩散</h3><p>读扩散只保存一份群消息，用户读取时再按会话去拉。<br>优点是写入轻，缺点是读取和状态计算更复杂。</p>
+<p>我更倾向读扩散，单聊下读写扩散相差不大，差别在大群聊天就能体现出来了。<br>场景：用户 A 在 1000 人的群中发一条消息：<br>写扩散：先存 1 条原始消息到 message 表，再向 1000 个群成员的收件箱各写 1 条关联记录（inbox 表需写 1000 条）。<br>读扩散：服务器只需将消息存储到消息表（1 次写入），但是由于消息表可能积累很多历史消息的记录，所以读取最新消息时可能会读取大量历史消息再进行去重过滤比较耗时，但是这个缺点可以使用条件过滤解决。</p>
+<h1 id="会话级同步"><a href="#会话级同步" class="headerlink" title="会话级同步"></a>会话级同步</h1><p>IM 系统里的消息同步，麻烦的地方不只是把消息查出来。真正要处理的是几个边界：</p>
+<ul>
+<li>客户端断线后不能漏消息</li>
+<li>同一会话内消息顺序不能乱</li>
+<li>用户多端登录时，要能从同一个位置继续同步</li>
+<li>在线推送和离线补拉要使用同一套位置语义</li>
+</ul>
+<p>如果只依赖消息 ID 或时间戳作为拉取游标，这些问题会变得难处理。更稳妥的做法，是给每个会话维护一条独立递增的序列号，也就是 seq。</p>
+<p>一条消息写入某个会话时，服务端为它分配该会话内的下一个 seq。这个 seq 只在当前 conversationId 下有意义，不要求全局连续。这样一来，客户端同步消息时，不需要关心消息在哪个节点生成，也不需要依赖服务端时间，只要记住自己在这个会话中已经同步到哪个 seq 即可。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> message</span><br><span class="line"><span class="keyword">where</span> conversation_id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">and</span> seq <span class="operator">&gt;</span> ?</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> seq <span class="keyword">asc</span></span><br><span class="line">limit ?</span><br></pre></td></tr></table></figure>
+
+<p>这条查询对应的语义很直接：从某个会话里，取出客户端尚未同步的后续消息。只要 seq 的分配没有重复，也没有倒退，客户端就可以按区间补拉，服务端也能保证返回顺序。</p>
+<h2 id="会话状态"><a href="#会话状态" class="headerlink" title="会话状态"></a>会话状态</h2><p>围绕 seq，服务端至少需要维护几类状态：</p>
+<ul>
+<li><code>lastSeq</code>：当前会话已经产生的最大 <code>seq</code></li>
+<li><code>readSeq</code>：某个用户在该会话中已经读到的位置</li>
+<li><code>localSeq</code>：客户端本地已经同步到的位置</li>
+</ul>
+<p>其中，<code>lastSeq</code> 属于会话维度，<code>readSeq</code> 属于用户和会话的关系维度，<code>localSeq</code> 则是客户端本地状态。</p>
+<p>单聊和群聊都可以套用这一模型。区别在于，群聊还需要结合成员关系判断用户能看到哪些消息，以及哪些在线用户需要被投递。</p>
+<p>未读数也可以从这里计算出来：<br>$unread &#x3D; lastSeq - readSeq$</p>
+<p>这种方式比单独维护未读计数器更不容易出现状态偏差。只要 <code>readSeq</code> 推进正确，未读数就是一个派生结果，而不是另一份需要额外同步维护的数据。</p>
+<h2 id="为什么不用-msg-id-做游标"><a href="#为什么不用-msg-id-做游标" class="headerlink" title="为什么不用 msg_id 做游标"></a>为什么不用 msg_id 做游标</h2><p>服务端消息主键可以继续使用雪花 ID 或数据库自增 ID，但它不适合作为会话同步游标。</p>
+<p>原因在于，消息 ID 通常表达的是全局生成顺序，而不是某个会话内的写入顺序。分布式环境下，不同节点生成 ID、写库、投递的时间并不完全一致。较早生成的消息，可能因为节点负载、网络抖动或事务等待而较晚入库。</p>
+<p>如果客户端已经把游标推进到一个更大的消息 ID，后面再落库的一条较小 ID 消息，就可能被跳过。对于 IM 来说，这类问题很难接受，因为用户看到的结果就是消息丢了。</p>
+<p>而 <code>conversationId + seq</code> 的含义更窄，也更适合消息同步。它只要求在同一个会话内递增，不试图表达全局顺序。IM 客户端真正关心的，通常也是某个会话里的消息顺序，而不是全站所有消息的先后关系。</p>
+<h2 id="为什么不用时间戳做游标"><a href="#为什么不用时间戳做游标" class="headerlink" title="为什么不用时间戳做游标"></a>为什么不用时间戳做游标</h2><p>时间戳也有类似问题。（时间戳由服务端生成和精度而产生的问题）</p>
+<p>如果客户端用下面这种条件拉消息：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">from</span> message</span><br><span class="line"><span class="keyword">where</span> conversation_id <span class="operator">=</span> ?</span><br><span class="line">  <span class="keyword">and</span> created_at <span class="operator">&gt;</span> ?</span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> created_at <span class="keyword">asc</span></span><br><span class="line">limit ?</span><br></pre></td></tr></table></figure>
+
+<p>边界处很容易出错。多条消息可能拥有相同的时间戳；不同应用节点的时钟也可能存在偏差；某条消息生成得早，但因为写库延迟，实际落库时间晚于客户端上一次同步。</p>
+<p>即使把查询改成 <code>created_at + msg_id</code> 的组合游标，也只是缓解问题，不能从根上解决会话内顺序的定义问题。因为时间戳描述的是某个时间点，而不是会话中的第几条消息。</p>
+<p><code>seq</code> 则不同。它直接把顺序变成了会话内的编号，与消息是一对一的关系。客户端同步到 <code>seq = 100</code>，下一次就从 <code>seq &gt; 100</code> 开始拉。这个模型更贴近 IM 的业务语义。</p>
+<h2 id="seq-生成方案"><a href="#seq-生成方案" class="headerlink" title="seq 生成方案"></a>seq 生成方案</h2><p><code>seq</code> 的关键不是形式，而是分配方式。对同一个 <code>conversationId</code>，服务端必须保证 <code>seq</code> 单调递增且不重复。</p>
+<p>常见做法有几种：</p>
+<ul>
+<li>使用 Redis <code>INCR</code> 为每个会话生成递增序号</li>
+<li>在数据库的会话表中维护 <code>last_seq</code>，通过行锁或事务推进</li>
+<li>使用单独的序列号服务，为会话分配 <code>seq</code></li>
+</ul>
+<p>如果系统规模不大，数据库事务方案更容易保证一致性。消息写入时，先锁定会话记录，推进 <code>last_seq</code>，再把消息和对应 <code>seq</code> 一起写入消息表。缺点是热点群聊会给数据库带来压力。</p>
+<p>Redis <code>INCR</code> 性能更好，但要处理 Redis 成功递增后消息写库失败的情况。此时可能出现 <code>seq</code> 空洞。一般来说，<code>seq</code> 不一定要求绝对连续，但客户端拉取逻辑必须能接受中间缺号。如果业务强依赖连续序号，就需要额外的事务补偿或写入状态表。</p>
+<h1 id="推送与拉取"><a href="#推送与拉取" class="headerlink" title="推送与拉取"></a>推送与拉取</h1><p>消息分发不适合只依赖单一的 Push 或 Pull。更常见的方式，是把链路拆成两部分：</p>
+<ul>
+<li>在线链路：用户在线时，服务端直接 push 新消息</li>
+<li>补偿链路：用户上线、重连或发现消息缺口时，客户端主动 pull 缺失消息</li>
+</ul>
+<p>在线 push 负责实时性，离线 pull 负责可靠性。两条链路使用同一套 <code>conversationId + seq</code> 语义，客户端只需要维护自己在每个会话中的同步位置。</p>
+<p>用户在线时，服务端可以直接推送新消息。客户端收到后，如果发现新消息的 <code>seq</code> 正好等于本地 <code>localSeq + 1</code>，就可以直接展示，并推进本地同步位置。</p>
+<p>如果收到的 <code>seq</code> 大于 <code>localSeq + 1</code>，说明中间有消息缺失。此时不应该直接把这条消息插入正常时间线，而应先触发一次补拉，把缺失区间补齐后，再按 <code>seq</code> 排序展示。</p>
+<p>这个处理可以覆盖网络抖动、跨节点推送延迟、客户端短暂断线等情况。服务端 push 不需要承担所有可靠性问题，客户端也不需要定时全量拉取历史消息。</p>
+<h2 id="上线与重连同步"><a href="#上线与重连同步" class="headerlink" title="上线与重连同步"></a>上线与重连同步</h2><p>用户上线、重连或切换设备后，不适合让服务端把所有历史消息重新 push 一遍。更合适的方式，是服务端先返回每个会话的位置信息，例如 <code>lastSeq</code> 和用户自己的 <code>readSeq</code>，客户端再根据本地 <code>localSeq</code> 判断是否需要补拉。</p>
+<p>如果客户端发现某个会话的 <code>localSeq</code> 小于服务端返回的 <code>lastSeq</code>，说明本地还有消息没有同步。此时客户端带上 <code>conversationId + localSeq</code> 请求服务端，服务端返回该会话中 <code>seq &gt; localSeq</code> 的消息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">conversationId + localSeq -&gt; pull messages where seq &gt; localSeq</span><br></pre></td></tr></table></figure>
+
+<p>这个流程本质上不是重新同步全部历史，而是从客户端已知的位置继续往后拉。无论是断线重连，还是多端登录，只要客户端和服务端都围绕同一个 <code>seq</code> 工作，就可以从明确的位置继续同步。</p>
+<h2 id="群聊与单聊"><a href="#群聊与单聊" class="headerlink" title="群聊与单聊"></a>群聊与单聊</h2><p>单聊和群聊在客户端同步模型上没有本质区别，都是围绕 <code>conversationId + seq</code> 拉取消息。</p>
+<p>差别主要在服务端投递过程。</p>
+<p>单聊只需要定位接收方设备，再判断用户是否在线。群聊则需要先根据成员关系筛选可见用户，再判断哪些用户在线，最后按用户所在节点进行分发。</p>
+<p>无论是单聊还是群聊，消息一旦写入会话，就应该先获得该会话内的 <code>seq</code>。后续 push、pull、未读计算，都基于这个 <code>seq</code> 展开。</p>
+<h1 id="缓存分片"><a href="#缓存分片" class="headerlink" title="缓存分片"></a>缓存分片</h1><p>曾经我考虑过消息缓存的问题：对于成员很大的群，这几万人都去获取群里相同的一条消息，是否需要把最近一段时间的群消息写入 Redis 缓存分片呢？如：</p>
+<ul>
+<li>每 5 分钟一个分片</li>
+<li>消息落库后同步写入当前分片</li>
+<li>客户端优先查最近分片</li>
+<li>超出窗口后再回数据库</li>
+</ul>
+<p>其实如果是群成员在线情况更多的话，其实这个优化也没太大作用，因为对于在线用户服务端都会主动去 push 新消息，这是避免不了的资源消耗…</p>
+<p>这个想法可能对断线后拉新消息的群成员更多的情况有点帮助，但可能也不多。因为你要考虑这个缓存分片多久过期，过期前是否会有较多的用户去 pull 群消息。如果这两个问题没想清楚的话，这个优化也许本身没啥作用。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>把上面几块拼起来，一个相对可行的方案大概是这样：</p>
+<ul>
+<li>Netty 负责 WebSocket 接入</li>
+<li>Redis 保存用户、设备、节点与 <code>sessionId</code> 路由</li>
+<li>消息加密：单聊使用 X3DH 加密，群聊使用对称加密</li>
+<li>消息可靠性依赖应用层确认，而不是只依赖 TCP</li>
+<li>单聊、群聊统一成会话级 <code>seq</code> 同步，未读数由 <code>lastSeq - readSeq</code> 计算，不再额外维护未读计数器</li>
+<li>用户在线时，服务端直接 push 消息</li>
+<li>用户断开连接重连或刚上线时，客户端根据 <code>lastSeq/readSeq</code> 主动 pull 补齐历史消息</li>
+</ul>
+<p>对于 IM 系统的设计上，我的个人理解时要专注于消息的可靠性方面，必须做到不漏消息、不乱序、离线后可正确拉取历史消息。之后可能就是多端登陆、顶号下线之类的功能，当然消息加密方面我个人觉得这也是不可忽视的一环。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io">ECAMT35</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://ecamt35.github.io/4f477c019da5/">http://ecamt35.github.io/4f477c019da5/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://ecamt35.github.io" target="_blank">ECAMT35 的地下室</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">分布式系统</a></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/3d36dd04b30a/" title="分布式下的WebSocket"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">分布式下的WebSocket</div></div><div class="info-2"><div class="info-item-1">分布式下的WebSocket问题</div></div></div></a><a class="pagination-related" href="/ee27a511e528/" title="Netty使用记录"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Netty使用记录</div></div><div class="info-2"><div class="info-item-1">Netty使用记录</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/fa2bcf65db26/" title="CAP与分布式系统"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-08</div><div class="info-item-2">CAP与分布式系统</div></div><div class="info-2"><div class="info-item-1">CAP理论与理解</div></div></div></a><a class="pagination-related" href="/3d36dd04b30a/" title="分布式下的WebSocket"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-05-31</div><div class="info-item-2">分布式下的WebSocket</div></div><div class="info-2"><div class="info-item-1">分布式下的WebSocket问题</div></div></div></a><a class="pagination-related" href="/221c331ea1c6/" title="负载均衡"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-22</div><div class="info-item-2">负载均衡</div></div><div class="info-2"><div class="info-item-1">负载均衡</div></div></div></a><a class="pagination-related" href="/15c78de5d315/" title="Raft阅读随记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-02</div><div class="info-item-2">Raft阅读随记</div></div><div class="info-2"><div class="info-item-1">记录阅读Raft时的一些疑问及思考</div></div></div></a><a class="pagination-related" href="/9a0e6259ac11/" title="浅读Raft算法"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-02</div><div class="info-item-2">浅读Raft算法</div></div><div class="info-2"><div class="info-item-1">截取融合USENIX ATC'14版本与作者博士论文版本的奇美拉，前部分主要以USENIX ATC'14为主+个人修改，后部分以作者博士论文版本的机翻为主。章节引用、图片序号没更正，看上去也许比较乱...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/image/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">ECAMT35</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">18</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ECAMT35" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:tsuisora@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F-WebSocket"><span class="toc-number">1.</span> <span class="toc-text">分布式 WebSocket</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A5%E5%85%A5%E6%9E%B6%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">接入架构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Redis-%E8%B7%AF%E7%94%B1%E6%A8%A1%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">Redis 路由模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#sessionId-%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">3.1.</span> <span class="toc-text">sessionId 的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%AF%E7%94%B1%E8%A6%86%E7%9B%96%E4%B8%8E%E6%B8%85%E7%90%86"><span class="toc-number">3.2.</span> <span class="toc-text">路由覆盖与清理</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E5%8A%A0%E5%AF%86"><span class="toc-number">4.</span> <span class="toc-text">消息加密</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E9%9D%A0%E6%8A%95%E9%80%92"><span class="toc-number">5.</span> <span class="toc-text">可靠投递</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8D%E5%8F%AF%E9%9D%A0%E7%9A%84%E5%8F%AF%E8%83%BD%E6%80%A7"><span class="toc-number">5.1.</span> <span class="toc-text">不可靠的可能性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E6%8A%A5%E6%96%87%E8%AE%BE%E8%AE%A1"><span class="toc-number">5.2.</span> <span class="toc-text">六报文设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%91%E9%80%81%E7%AB%AF%E5%B9%82%E7%AD%89"><span class="toc-number">5.3.</span> <span class="toc-text">发送端幂等</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B6%85%E6%97%B6%E4%B8%8E%E9%87%8D%E4%BC%A0"><span class="toc-number">5.4.</span> <span class="toc-text">超时与重传</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%9A%E8%AE%BE%E5%A4%87%E4%B8%8E%E5%9C%A8%E7%BA%BF%E7%8A%B6%E6%80%81"><span class="toc-number">6.</span> <span class="toc-text">多设备与在线状态</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E7%BA%BF%E5%88%A4%E5%AE%9A"><span class="toc-number">6.1.</span> <span class="toc-text">在线判定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%83%E8%B7%B3%E6%9C%BA%E5%88%B6"><span class="toc-number">6.2.</span> <span class="toc-text">心跳机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9C%A8%E7%BA%BF%E7%8A%B6%E6%80%81%E4%B8%8E%E8%B7%AF%E7%94%B1%E7%8A%B6%E6%80%81"><span class="toc-number">6.3.</span> <span class="toc-text">在线状态与路由状态</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E6%A8%A1%E5%9E%8B"><span class="toc-number">7.</span> <span class="toc-text">同步模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E6%89%A9%E6%95%A3%E4%B8%8E%E5%86%99%E6%89%A9%E6%95%A3"><span class="toc-number">7.1.</span> <span class="toc-text">读扩散与写扩散</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%99%E6%89%A9%E6%95%A3"><span class="toc-number">7.1.1.</span> <span class="toc-text">写扩散</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%BB%E6%89%A9%E6%95%A3"><span class="toc-number">7.1.2.</span> <span class="toc-text">读扩散</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D%E7%BA%A7%E5%90%8C%E6%AD%A5"><span class="toc-number">8.</span> <span class="toc-text">会话级同步</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BC%9A%E8%AF%9D%E7%8A%B6%E6%80%81"><span class="toc-number">8.1.</span> <span class="toc-text">会话状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8-msg-id-%E5%81%9A%E6%B8%B8%E6%A0%87"><span class="toc-number">8.2.</span> <span class="toc-text">为什么不用 msg_id 做游标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%94%A8%E6%97%B6%E9%97%B4%E6%88%B3%E5%81%9A%E6%B8%B8%E6%A0%87"><span class="toc-number">8.3.</span> <span class="toc-text">为什么不用时间戳做游标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#seq-%E7%94%9F%E6%88%90%E6%96%B9%E6%A1%88"><span class="toc-number">8.4.</span> <span class="toc-text">seq 生成方案</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A8%E9%80%81%E4%B8%8E%E6%8B%89%E5%8F%96"><span class="toc-number">9.</span> <span class="toc-text">推送与拉取</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%8A%E7%BA%BF%E4%B8%8E%E9%87%8D%E8%BF%9E%E5%90%8C%E6%AD%A5"><span class="toc-number">9.1.</span> <span class="toc-text">上线与重连同步</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BE%A4%E8%81%8A%E4%B8%8E%E5%8D%95%E8%81%8A"><span class="toc-number">9.2.</span> <span class="toc-text">群聊与单聊</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E5%88%86%E7%89%87"><span class="toc-number">10.</span> <span class="toc-text">缓存分片</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text">总结</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/9b46cddec5d5/" title="KVM">KVM</a><time datetime="2026-06-14T16:00:00.000Z" title="发表于 2026-06-15 00:00:00">2026-06-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/07e3b463471c/" title="Wine/Proton">Wine/Proton</a><time datetime="2026-06-06T16:00:00.000Z" title="发表于 2026-06-07 00:00:00">2026-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/8beea043f7a0/" title="自用Linux桌面环境">自用Linux桌面环境</a><time datetime="2026-06-06T16:00:00.000Z" title="发表于 2026-06-07 00:00:00">2026-06-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/221c331ea1c6/" title="负载均衡">负载均衡</a><time datetime="2026-03-21T16:00:00.000Z" title="发表于 2026-03-22 00:00:00">2026-03-22</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/f6b1ecf8ea6e/" title="Java虚拟线程">Java虚拟线程</a><time datetime="2026-02-09T16:00:00.000Z" title="发表于 2026-02-10 00:00:00">2026-02-10</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2026 By ECAMT35</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
