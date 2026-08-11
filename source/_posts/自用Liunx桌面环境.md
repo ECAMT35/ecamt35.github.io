@@ -1,8 +1,8 @@
 ---
 title: 自用Linux桌面环境
 date: 2026-06-07 00:00:00
-updated: 2026-06-07 00:00:00 
-description: 
+updated: 2026-08-11 00:00:00 
+description: 自用Linux桌面环境 
 categories: 
 - GNU/Linux
 tags:
@@ -38,10 +38,10 @@ ttf-hack
 ttf-nerd-fonts-symbols
 ttf-nerd-fonts-symbols-common
 
-屏幕管理:
+屏幕管理: 
+分辨率、刷新率、多设备管理: kanshi + [wlr-randr](https://sr.ht/~emersion/wlr-randr/)
 锁屏: swaylock + swayidle
-关闭屏幕: wlopm + swayidle
-屏幕分辨率: [wlr-randr](https://sr.ht/~emersion/wlr-randr/)
+关闭屏幕: wlopm + swayidle + [wayland-pipewire-idle-inhibit]([https://github.com/rafaelrc7/wayland-pipewire-idle-inhibit](https://github.com/rafaelrc7/wayland-pipewire-idle-inhibit))
 背光调节: brightnessctl
 桌面壁纸: [swaybg](https://github.com/swaywm/swaybg)
 bar: [dam（自定义修改）](https://github.com/ECAMT35/dam)
@@ -55,7 +55,7 @@ bar: [dam（自定义修改）](https://github.com/ECAMT35/dam)
 浏览器: Firefox, Chromium
 文件下载: aria2c, [aria2c config](https://github.com/P3TERX/aria2.conf)
 安卓模拟器: Waydroid
-移动硬盘、U 盘挂载：udiskie
+移动硬盘、U 盘挂载：yazi 插件及相关依赖
 快照：Timeshift + restic
 
 音视频媒体:
@@ -72,7 +72,7 @@ XDG 桌面门户: xdg-desktop-portal-gtk, xdg-desktop-portal-wlr
 画板、图片编辑: Krita
 小沙箱: Flatpak
 
-游戏: Steam, Wine, KVM
+游戏: Lutris, ProntonPlus(DW-Proton), Steam, KVM
 
 其他 Wayland 应用查看：
 https://arewewaylandyet.com/
