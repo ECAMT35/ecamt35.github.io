@@ -57,13 +57,33 @@ pacman -S obs-studio
 ```bash
 pacman -S linux-headers
 
-pacman -S v4l2loopback v4l-utils
+pacman -S v4l2loopback v4l-utils v4l2loopback-utils
 ```
 
 3. 内核热加载模块
 
 ```bash
 sudo modprobe v4l2loopback
+```
+
+可以使用 v4l2-ctl 列出所有视频设备，新的 v4l2loopback 设备应该出现在列表中
+
+```bash
+v4l2-ctl --list-devices
+```
+
+v4l2loopback 可以通过多种设备创建选项进行加载
+
+```bash
+sudo modprobe v4l2loopback video_nr=9 card_label=Video-Loopback exclusive_caps=1
+```
+
+这将创建 /dev/video9 作为回环设备。exclusive_caps=1 对于某些基于 Chromium/WebRTC 的应用程序（如 jitsi-meet-desktop-bin 或 zoom）是必需的。这将启用 exclusive_caps 模式，该模式仅排他性地报告 CAPTURE（采集）或 OUTPUT（输出）能力。新创建的设备将仅宣布具有 OUTPUT 能力（因此普通摄像头应用程序（包括 Chrome）将无法看到它）。一旦你将生产者（producer）连接到该设备，它将开始仅宣布具有 CAPTURE 能力（因此那些拒绝打开除采集以外具有其他能力的设备的应用程序也可以打开它）。更多选项可以在 [官方文档](https://github.com/umlaeute/v4l2loopback#options) 中找到。
+
+如果模块已经加载，上述命令可能没有效果。模块必须先卸载，然后重新加载
+
+```bash
+sudo modprobe -r v4l2loopback
 ```
 
 4. 检查
@@ -91,6 +111,5 @@ v4l2loopback/0.15.4, 7.1.8-arch1-3, x86_64: installed
 选择 Camera 测试
 选择授予虚拟摄像头权限
 ![](20260815065525.png)
-
 可以看见已经正常捕获桌面屏幕
 ![](20260815065553.png)
