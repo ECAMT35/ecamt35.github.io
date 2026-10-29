@@ -264,8 +264,9 @@ footer:
     since: 
   custom_text:
   # Copyright of theme and framework
-  copyright: true
-
+  copyright:
+    enable: true
+    version: true
 # --------------------------------------
 # Aside Settings
 # --------------------------------------
@@ -904,7 +905,7 @@ lightbox: fancybox
 
 # Series
 series:
-  enable: false
+  enable: true
   # Order by title or date
   orderBy: 'title'
   # Sort of order. 1, asc for ascending; -1, desc for descending
@@ -920,9 +921,9 @@ abcjs:
 # Mermaid
 # https://github.com/mermaid-js/mermaid
 mermaid:
-  enable: false
+  enable: true
   # Write Mermaid diagrams using code blocks
-  code_write: false
+  code_write: true
   # built-in themes: default / forest / dark / neutral
   theme:
     light: default
