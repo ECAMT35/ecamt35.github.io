@@ -2,6 +2,10 @@ name: Hexo Blog CI/CD
 on:
   push:
     branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -9,7 +13,7 @@ concurrency:
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       NODE_ENV: production
@@ -17,27 +21,20 @@ jobs:
 
     steps:
       - name: Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js 
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: "22.x"
+          node-version: "24.x"
           cache: npm
+          cache-dependency-path: package-lock.json
           check-latest: true
 
-      - name: Cache Node Modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}-${{ hashFiles('package.json') }}
-
       - name: Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci --prefer-offline --no-audit --no-fund
+        run: npm ci --prefer-offline --no-audit --no-fund
 
       - name: Clean Before Generate
         run: npx hexo clean
@@ -48,6 +45,9 @@ jobs:
           echo "Public directory size:"
           du -sh public
 
+      - name: Verify Generated Site
+        run: test -s ./public/index.html
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -56,10 +56,3 @@ jobs:
           publish_dir: ./public
           force_orphan: true
           allow_empty_commit: false
-          keep_files: |
-            CNAME
-            .nojekyll
-
-      - name: Verify Deployment
-        run: |
-          echo "Deployment completed successfully!"
