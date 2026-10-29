@@ -1,7 +1,7 @@
 ---
 title: Wine/Proton
 date: 2026-06-07 00:00:00
-updated: 2026-06-07 00:00:00 
+updated: 2026-10-30 00:00:00 
 description: 使用Wine/Proton运行.exe程序
 categories: 
 - GNU/Linux
@@ -15,21 +15,10 @@ https://www.protondb.com/
 
 # 自用方案
 
-使用 bottles/lutris 作为前端启动器，使用 [ProtonPlus](https://github.com/Vysp3r/ProtonPlus) 管理容器版本；
-日常使用 Wine-staging/[proton-ge-custom-bin](https://aur.archlinux.org/packages/proton-ge-custom-bin)/[DW-Prototn](https://aur.archlinux.org/packages/dwproton-bin) 作为容器。
+使用 lutris 作为前端启动器，使用 [ProtonPlus](https://github.com/Vysp3r/ProtonPlus) 管理容器版本；
+日常使用 Proton-CachyOS/DW-Prototn作为容器。
 
-推荐安装的函数库： 
-
-- d3d11 
-- d3d9
-- devenum
-- gdiplus
-- quartz
-- wmp11
-- directshow
-- lavfilters
-
-部分应用可能会需要其他的依赖（参考 [WineHQ 页面](https://gitlab.winehq.org/wine/wine/-/wikis/Building-Wine#satisfying-build-dependencies)），可以一劳永逸全部装完：
+部分应用可能会需要的系统依赖（参考 [WineHQ 页面](https://gitlab.winehq.org/wine/wine/-/wikis/Building-Wine#satisfying-build-dependencies)），可以一劳永逸全部装完：
 
 - TLS 的 32 位支持可以安装 [lib32-gnutls](https://archlinux.org/packages/?name=lib32-gnutls)
 - 手柄和游戏杆的 32 位支持可以安装 [lib32-sdl2](https://aur.archlinux.org/packages/lib32-sdl2/)
@@ -38,7 +27,7 @@ https://www.protondb.com/
 
 运行依赖于 .NET 的应用程序需安装：wine-mono
 运行依赖于 Internet Explorer 的应用程序 ：wine-gecko
-这两个可以在 bottles/lutris 里面进行下载，一般可以不行进系统级的安装
+这两个可以在 lutris 里面进行下载，一般可以不行进系统级的安装
 
 # 常见问题
 ## 字体
@@ -50,7 +39,7 @@ https://www.protondb.com/
 
 运行不了的程序，如果找不出原因去修，那就尝试使用其他版本的 Wine（这就是我推荐使用 ProtonPlus 的原因，别只盯着原版 Wine 使用，这会让你轻松很多）
 
-可以到 protonDB 看看有没有运行成功的例子，借鉴下方案。
+可以到 ProtonDB 看看有没有运行成功的例子，借鉴下方案。
 
 如果还是不行只能启动 KVM 了
 
@@ -77,5 +66,4 @@ Wine 有一个内置的 FPS 检测器，在环境变量 `WINEDEBUG=fps` 设定�
 ## Vulkan
 
 默认的 wine Vulkan ICD 加载器在大多数程序中都工作地很好，但是不支持高级特性，例如 Vulkan 层。为使用这些特性，你需要安装官方的 Vulkan SDK，见原始的 Vulkan 补丁作者的 [GitHub page](https://github.com/roderickc/wine-vulkan) 的第二到四步。
-
 
