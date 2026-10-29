@@ -208,8 +208,6 @@ _PS：后续高版本的`MySQL`移除了查询缓存区，但并未移除缓冲�
 
 # 二、SQL查询语句执行流程
 
-[一图流](https://mermaid-live.nodejs.cn/edit#pako:eNptkl1P2lAYx7_KyUm8A0Lpi6XZTMZ8wftdrfWiWauYSEu6NtlGSeZ0BiMSVDCYbWw4jWQLhWTZuwsfZpzT9lvslCODoOfq_J_n__yfX05OET4xNR1KcMNSCznwaFExADlzc-B-dEAwaOHqZdj8hr2vtEQND2TknePyd_9zbw3ci8cXQEamXnTWWaOeDIjqru-1_doebf59uY3f7YRntfBTJehtE4nKe-HrQ__XwO8cuEtycPURt2o0YxZl1LqNskTXBL1D_KVB4oiJ5Aa97n8ZX_Dr73G5RhPwhyMXLMvh-S662CVkE-DlcVJ3-HOfmmeAx0n4tD8VtiIPr5uocnonNm0Nf1Tx_lXQrtzmX7l5Jho8MgVeG5WPXZCVqZ4gZm8Q-zt-vYO6TfSqg64b-KTqglV5Ws_4B3X0phV4ffSn4YIM7c2A-r9PcOstdU7zrd4VkVUMGCOfZlODkm05egzmdSuvRhIWozkF2jk9rytQIldNX1edLVuBilEiYwXVeGya-fGkZTobOSitq1tPiXIKmmrri5sq-ZETi25ouvXQdAwbSvwoAUpF-AxKTJJLiCyXFlkxxQsiK8Tg86g6n5jnGI5Ni0yaZfk0V4rBF6OdyYSYZFIphhcFQWBFPiWU_gGnlliL)
-
 ```mermaid
 graph TD
     %% ===== 连接阶段 =====

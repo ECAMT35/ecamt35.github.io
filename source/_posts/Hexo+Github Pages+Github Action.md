@@ -31,5 +31,5 @@ tags:
 7. 本地推送后，等待action完成即可访问静态页面（`userName.github.io/[repo]`）
 
 >工作流示例：[Github Action's workflow](https://github.com/ECAMT35/ecamt35.github.io/blob/master/.github/workflows/deploy.yml)
-
+>机器人（可用于检查、更新框架版本）：[Github Action's dependabot](https://github.com/ECAMT35/ecamt35.github.io/blob/master/.github/dependabot.yml)
 
