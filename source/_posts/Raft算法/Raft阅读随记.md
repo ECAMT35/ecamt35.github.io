@@ -1,6 +1,7 @@
 ---
 title: Raft阅读随记
 date: 2026-02-02 11:30:00
+updated: 2026-02-02 11:30:00
 description: 记录阅读Raft时的一些疑问及思考
 categories: 
 - 技术理论

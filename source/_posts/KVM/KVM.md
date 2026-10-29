@@ -1,6 +1,7 @@
 ---
 title: KVM
 date: 2026-06-15 00:00:00
+updated: 2026-06-15 00:00:00
 description: KVM的使用体验
 categories: 
 - GNU/Linux

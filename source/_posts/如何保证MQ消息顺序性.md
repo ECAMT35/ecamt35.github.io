@@ -1,6 +1,7 @@
 ---
 title: 如何保证MQ消息顺序性
 date: 2025-11-01 00:00:00
+updated: 2025-11-01 00:00:00
 description: 如何保证MQ消息顺序性
 categories:
 - 技术理论

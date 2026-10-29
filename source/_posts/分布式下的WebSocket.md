@@ -1,6 +1,7 @@
 ---
 title: 分布式下的WebSocket
 date: 2025-05-31 00:00:00
+updated: 2025-05-31 00:00:00
 description: 分布式下的WebSocket问题
 categories: 
 - 技术理论 

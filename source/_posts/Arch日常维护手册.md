@@ -1,6 +1,7 @@
 ---
 title: Arch日常维护手册
 date: 2024-03-12 00:00:00
+updated: 2024-03-12 00:00:00
 description: Archlinux日常维护命令速查
 categories: 
 - GNU/Linux

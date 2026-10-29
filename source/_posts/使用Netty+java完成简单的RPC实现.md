@@ -1,6 +1,7 @@
 ---
 title: 使用Netty+java完成简单的RPC实现
 date: 2025-11-25 00:00:00
+updated: 2025-11-25 00:00:00
 description: 使用Netty+java完成简单的RPC实现
 categories: 
 - 技术理论

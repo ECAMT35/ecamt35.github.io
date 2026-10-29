@@ -1,6 +1,7 @@
 ---
 title: Java虚拟线程
 date: 2026-02-10 00:00:00
+updated: 2026-02-10 00:00:00
 description: Java虚拟线程
 categories: 
 - 技术理论

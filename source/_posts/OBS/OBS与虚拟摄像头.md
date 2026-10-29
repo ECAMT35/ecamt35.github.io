@@ -1,6 +1,7 @@
 ---
 title: OBS与虚拟摄像头
 date: 2026-08-15 00:00:00
+updated: 2026-08-15 00:00:00
 description: 记录使用OBS与虚拟摄像头
 categories: 
 - GNU/Linux

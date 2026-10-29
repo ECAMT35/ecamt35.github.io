@@ -1,6 +1,7 @@
 ---
 title: Redis事务
 date: 2025-12-31 12:00:00
+updated: 2025-12-31 12:00:00
 description: Redis事务相关
 categories: 
 - 技术理论 

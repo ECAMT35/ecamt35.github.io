@@ -1,6 +1,7 @@
 ---
 title: CAP与分布式系统
 date: 2025-05-08 00:00:00
+updated: 2025-05-08 00:00:00
 description: CAP理论与理解
 categories: 
 - 技术理论
