@@ -38,7 +38,7 @@ SOCKS5 由镜像附带的 Dante（`danted`）提供，HTTP 代理由 Tinyproxy �
 
 `/dev/net/tun` 是 Linux 内核提供的 TUN/TAP 设备入口。容器共享宿主机内核，通过这个入口在自己的网络命名空间创建 TUN 接口。
 
-## 一、准备条件
+## 准备条件
 
 需要准备：
 
@@ -57,7 +57,7 @@ ls -l /dev/net/tun
 sudo modprobe tun
 ```
 
-## 二、Docker Compose 配置
+## Docker Compose 配置
 
 创建目录：
 
@@ -104,7 +104,7 @@ services:
 
 `PASSWORD` 是 VNC 密码，可以改成自己的密码，建议不超过 8 位。端口绑定到 `127.0.0.1`，表示只有宿主机可以访问 VNC 和代理。`EXIT: "1"` 配合 `restart: unless-stopped`，让 aTrust 前端退出时由 Docker 重启整个容器，而不是在容器内不断重启前端和后端；原因和验证方法见下文“前端反复崩溃、CPU 和温度升高”。
 
-## 三、启动 aTrust 容器
+## 启动 aTrust 容器
 
 创建新数据目录：
 
@@ -144,7 +144,7 @@ sudo docker compose logs --tail=100 atrust
 New Xtigervnc server ... on port 5901
 ```
 
-## 四、安装并连接 TigerVNC
+## 安装并连接 TigerVNC
 
 Arch Linux 安装 TigerVNC：
 
@@ -172,7 +172,7 @@ vnc
 
 连接后可以看到容器里的 Linux 图形桌面。
 
-## 五、登录 aTrust
+## 登录 aTrust
 
 在 VNC 桌面中启动 aTrust，完成登录。
 
@@ -183,7 +183,7 @@ sudo docker exec atrust ip addr show dev utun7
 sudo docker exec atrust ip route
 ```
 
-## 六、配置宿主机代理
+## 配置宿主机代理
 
 容器启动时会启动代理服务；完成 aTrust 登录后，代理才能利用 VPN 访问受授权的公司内网资源。宿主机上的访问地址为：
 
@@ -241,11 +241,11 @@ chromium --proxy-server="http://127.0.0.1:8888"
 
 如ssh,git,lftp等工具，如果需要访问内网也需要单独设置，此处不展开。
 
-## 七、测试代理
+## 测试代理
 
 使用设置了代理的浏览器，访问公司内网。
 
-## 八、常用 Docker 操作
+## 常用 Docker 操作
 
 查看状态：
 
@@ -293,7 +293,7 @@ sudo docker compose down -v
 
 `-v` 会额外删除关联的匿名卷和 Compose 声明的命名卷（外部卷除外），但不会删除 `./data:/root` 这类绑定挂载的宿主机 `./data` 目录。日常停止或重建无需这个选项。
 
-## 九、常见日志说明
+## 常见日志说明
 
 ### `ulimit` 警告
 
@@ -353,7 +353,7 @@ vncviewer 127.0.0.1::5901
 
 连接图形界面。
 
-## 十、日常使用流程
+## 日常使用流程
 
 ```bash
 cd ~/docker/atrust
