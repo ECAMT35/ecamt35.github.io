@@ -1,7 +1,7 @@
 ---
 title: 自用Linux桌面环境
 date: 2026-06-07 00:00:00
-updated: 2026-08-11 00:00:00 
+updated: 2026-11-12 00:00:00 
 description: 自用Linux桌面环境 
 categories: 
 - GNU/Linux
@@ -137,4 +137,14 @@ Firefox 开启硬件视频解码，进入 `about:config` 设置：
 其他可选调整：  
 [https://wiki.archlinux.org/title/Firefox/Tweaks](https://wiki.archlinux.org/title/Firefox/Tweaks)  
 [https://github.com/arkenfox/user.js](https://github.com/arkenfox/user.js)
+
+## 英伟达独显
+
+原文：[低功耗（TDP）](https://wiki.archlinuxcn.org/wiki/NVIDIA_Optimus#%E4%BD%8E%E5%8A%9F%E8%80%97%EF%BC%88TDP%EF%BC%89)
+自 530.41 驱动版本以来，出现了显卡锁定在低功耗限制的情况，NVIDIA 驱动已禁用使用 `nvidia-smi` 命令手动设置功耗限制的功能，因此许多笔记本电脑被锁定在低功耗和性能不佳的状态。
+要解决此问题（适用于 Ampere 代或更新），[启动/启用](https://wiki.archlinuxcn.org/wiki/%E5%90%AF%E5%8A%A8/%E5%90%AF%E7%94%A8 "启动/启用") `nvidia-powerd.service`，这将启用 [DynamicBoost](https://download.nvidia.com/XFree86/Linux-x86_64/535.54.03/README/dynamicboost.html)。
+
+```bash
+sudo systemctl disable --now nvidia-powerd
+```
 
