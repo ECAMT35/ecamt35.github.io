@@ -1,7 +1,7 @@
 ---
 title: KVM
 date: 2026-06-15 00:00:00
-updated: 2026-06-15 00:00:00
+updated: 2026-11-12 00:00:00
 description: KVM的使用体验
 categories: 
 - GNU/Linux
@@ -27,9 +27,12 @@ KVM（Kernel-based Virtual Machine）是**基于内核的虚拟机**，它是 Li
 
 Arch Linux 中相关安装包的详细信息
 
-- [qemu-desktop](https://archlinux.org/packages/?name=qemu-desktop) 包 包提供了 `x86_64` 架构的模拟器， 可以进行全系统模拟 (`qemu-system-x86_64`)。 [qemu-emulators-full](https://archlinux.org/packages/?name=qemu-emulators-full) 包包提供了 `x86_64` 用户模式的模拟 (`qemu-x86_64`)。 对于其他支持的架构，这个包都提供了全系统模拟和用户模拟两个变种 (比如说 `qemu-system-arm` 和 `qemu-arm`)。
+- [qemu-desktop](https://archlinux.org/packages/?name=qemu-desktop) 包提供了 `x86_64` 架构的模拟器， 可以进行全系统模拟 (`qemu-system-x86_64`)。 [qemu-emulators-full](https://archlinux.org/packages/?name=qemu-emulators-full) 包提供了 `x86_64` 用户模式的模拟 (`qemu-x86_64`)。 对于其他支持的架构，这个包都提供了全系统模拟和用户模拟两个变种 (比如说 `qemu-system-arm` 和 `qemu-arm`)。
+
 - 对应于这些包的无界面版本 (仅适用于全系统模拟模式) 分别是 [qemu-base](https://archlinux.org/packages/?name=qemu-base) 包 (仅 `x86_64`) 和 [qemu-emulators-full](https://archlinux.org/packages/?name=qemu-emulators-full) 包 (其余架构)。
+
 - 可以用如下独立的安装包中的 QEMU 模块扩展全系统模拟的功能: [qemu-block-gluster](https://archlinux.org/packages/?name=qemu-block-gluster) 包, [qemu-block-iscsi](https://archlinux.org/packages/?name=qemu-block-iscsi) 包, 和 [qemu-guest-agent](https://archlinux.org/packages/?name=qemu-guest-agent) 包。
+
 - [qemu-user-static](https://archlinux.org/packages/?name=qemu-user-static) 包 为所有 QEMU 支持的架构提供了一个带用户模式和静态链接模式的变种。 它的 QEMU 命令依照 `qemu-_target_architecture_-static` 的规则命名, 例如, `qemu-x86_64-static` 代表目标架构为 intel 64 位 CPU。
 
 如果只需要模拟 x86_64 的架构的话，qemu-desktop 是最好的选择：
@@ -164,6 +167,8 @@ virsh -c qemu:///session
 
 # 使用 Virt-manager 使用 Window 虚拟机
 
+以下为 win10 安装演示，win11 需要额外的一些配置，需先阅读 [添加硬件](#添加硬件) 的相关部分
+
 ## 基础安装
 
 ![](20260615112158.png)
@@ -182,6 +187,8 @@ virsh -c qemu:///session
 ![](20260615113929.png)
 
 添加 VirtIO 驱动以加速硬件驱动
+
+驱动地址：https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/
 ![](20260615114220.png)
 
 ![](20260615115139.png)
@@ -201,3 +208,15 @@ virsh -c qemu:///session
 路径：添加硬件 -> pci 主机设备 -> 找到你的设备添加后应用
 
 ![](20260615135154.png)
+
+
+>注:
+>1. 安装 win11 需要提供 TPM 2.0，先在系统进行安装：
+>```bash
+>sudo pacman -S swtpm
+>```
+>
+>然后在最终安装前添加 TPM 硬件：添加硬件 ->TPM->完成
+>
+>2. Windows 11 要求设备具备 Secure Boot 能力。在最终安装前进行设置，概况 ->虚拟机管理程序详情 ->固件 ->OVMF_CODE.secboot.4m.fd
+>3. Windows 11 要求设备必须满足 4G 以上的内存，否则无法安装
